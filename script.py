@@ -4,6 +4,9 @@ import json
 import os
 from twilio.rest import Client
 
+# The Flask application
+from app import app
+
 # Create a reddit instance
 reddit = praw.Reddit(client_id=config.REDDIT_CLIENT_ID,
                      client_secret=config.REDDIT_CLIENT_SECRET, password=config.PASSWORD,
