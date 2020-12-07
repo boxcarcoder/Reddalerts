@@ -21,5 +21,5 @@ migrate = Migrate(app, db)
 # The application imports modules, such as the routes module 
 # from the app package (/app). The import is at the bottom as a 
 # workaround to Flask's common problem with circular imports.
-from app import routes
+from app import routes, models
 
