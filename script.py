@@ -1,5 +1,5 @@
 import praw
-import config
+from config import Config
 import json
 import os
 from twilio.rest import Client
@@ -8,14 +8,14 @@ from twilio.rest import Client
 from app import app
 
 # Create a reddit instance
-reddit = praw.Reddit(client_id=config.REDDIT_CLIENT_ID,
-                     client_secret=config.REDDIT_CLIENT_SECRET, password=config.PASSWORD,
-                     user_agent='Reddalerts 1.0 by u/boxcarcoder', username=config.USERNAME)
+reddit = praw.Reddit(client_id=Config.REDDIT_CLIENT_ID,
+                     client_secret=Config.REDDIT_CLIENT_SECRET, password=Config.REDDIT_PASSWORD,
+                     user_agent='Reddalerts 1.0 by u/boxcarcoder', username=Config.REDDIT_USERNAME)
 
 reddit.read_only = True
 
 # Create a twilio client
-client = Client(config.TWILIO_ACCOUNT_SID, config.TWILIO_AUTH_TOKEN)
+client = Client(Config.TWILIO_ACCOUNT_SID, Config.TWILIO_AUTH_TOKEN)
 
 # Create test data to use with Praw and Twilio. This data will be received from the frontend as JSON.
 decodedData = {}
