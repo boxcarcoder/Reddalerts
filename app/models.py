@@ -7,7 +7,7 @@ from app import db
 # This class defines DB fields as class variables that use instances of the db.Column class.
 class User(db.Model):
     """
-    The user model.
+    The users table.
     """
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), index=True, unique=True)
@@ -16,4 +16,4 @@ class User(db.Model):
 
     # __repr__ tells Python how to print objects of this class.
     def __repr__(self):
-        return '<User {}>'.format(self.username)   
+        return '<User {}>'.format(self.username)
