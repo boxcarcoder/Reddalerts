@@ -1,7 +1,7 @@
+# import json
 import praw
 from config import Config
-import json
-import os
+# import os
 from twilio.rest import Client
 
 # The Flask application
