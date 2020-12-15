@@ -2,8 +2,17 @@
 Creating models for the SQL database.
 """
 from app import db
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import UserMixin
+from app import login
 
-class User(db.Model):
+# Load a user given an ID for Flask-Login.
+# Flask_Login will pass an id to this function to fetch a user.
+@login.user_loader
+def load_user(id):
+    return User.query.get(int(id))
+
+class User(UserMixin, db.Model):
     """
     The users table.
     """
@@ -15,9 +24,20 @@ class User(db.Model):
     # Connect a primary key to a foreign key to create one-to-many relationship.
     subreddits = db.relationship('Subreddit', backref='user', lazy='dynamic')
 
+
+    """
+    Helper Functions.
+    """
     # __repr__ tells Python how to print objects of this class.
     def __repr__(self):
         return '<User {}>'.format(self.username)
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+    
 
 class Subreddit(db.Model):
     """

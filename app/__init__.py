@@ -4,6 +4,7 @@ Module to create a Flask instance.
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from flask_login import LoginManager
 from config import Config
 
 # Create an application object as an instance of class Flask.
@@ -19,6 +20,9 @@ db = SQLAlchemy(app)
 
 # Initiate a migration engine for the database using the Migrate Flask extension.
 migrate = Migrate(app, db)
+
+# Initiate a Flask-Login instance to manage user login.
+login = LoginManager(app)
 
 # The application imports modules, such as the routes module
 # from the app package (/app). The import is at the bottom as a

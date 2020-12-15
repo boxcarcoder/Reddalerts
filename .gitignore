@@ -3,3 +3,4 @@ config.py
 /venv
 .vscode/
 .DS_Store
+app.db

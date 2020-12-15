@@ -5,7 +5,16 @@ from config import Config
 from twilio.rest import Client
 
 # The Flask application
-from app import app
+from app import app, db
+from app.models import User, Subreddit, Keyword
+
+"""
+Creating the Flask instances for a shell context.
+"""
+@app.shell_context_processor
+def make_shell_context():
+    return {'db': db, 'User': User, 'Subreddit': Subreddit, 'Keyword': Keyword}
+
 
 # Create a reddit instance
 reddit = praw.Reddit(client_id=Config.REDDIT_CLIENT_ID,
