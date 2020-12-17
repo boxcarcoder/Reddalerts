@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-// import './scss/App.scss';
+import './scss/App.scss';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
 // redux

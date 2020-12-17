@@ -11,7 +11,6 @@ const Login = ({ login }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
     // Send the form data to Redux action.
     login({ email, password });
   };
@@ -46,6 +45,7 @@ const Login = ({ login }) => {
           onChange={handlePassword}
           value={password}
         />
+        <input type='submit' value='Log In' />
       </form>
     </section>
   );

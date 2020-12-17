@@ -1,16 +1,27 @@
 import React, { useState } from 'react';
+import { register } from '../../actions/auth';
+import { connect } from 'react-redux';
 
-const Register = () => {
+const Register = ({ register }) => {
   const [formData, setFormData] = useState({
+    username: '',
     email: '',
     password: '',
   });
-  const { email, password } = formData;
+  const { username, email, password } = formData;
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Send formData to Redux action.
+    // Send the form data  to Redux action.
+    register({ username, email, password });
+  };
+
+  const handleUsername = (e) => {
+    setFormData({
+      ...formData,
+      username: e.target.value,
+    });
   };
 
   const handleEmail = (e) => {
@@ -32,6 +43,12 @@ const Register = () => {
       <h1>Sign Up</h1>
       <form onSubmit={handleSubmit}>
         <input
+          type='text'
+          placeholder='Username'
+          onChange={handleUsername}
+          value={username}
+        />
+        <input
           type='email'
           placeholder='Email'
           onChange={handleEmail}
@@ -43,9 +60,10 @@ const Register = () => {
           onChange={handlePassword}
           value={password}
         />
+        <input type='submit' value='Register' />
       </form>
     </section>
   );
 };
 
-export default Register;
+export default connect(null, { register })(Register);

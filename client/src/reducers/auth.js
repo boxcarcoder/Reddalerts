@@ -1,5 +1,10 @@
 /* eslint-disable import/no-anonymous-default-export */
-import { LOGIN_SUCCESS, LOGIN_FAIL } from '../actions/types';
+import {
+  LOGIN_SUCCESS,
+  LOGIN_FAIL,
+  REGISTER_SUCCESS,
+  REGISTER_FAIL,
+} from '../actions/types';
 
 const initialState = {
   token: localStorage.getItem('token'),
@@ -13,12 +18,14 @@ export default function (state = initialState, action) {
 
   switch (type) {
     case LOGIN_SUCCESS:
+    case REGISTER_SUCCESS:
       localStorage.setItem('token', payload.token);
       return {
         ...state,
         isAuthenticated: true,
       };
     case LOGIN_FAIL:
+    case REGISTER_FAIL:
       return {
         ...state,
         isAuthenticated: false,
