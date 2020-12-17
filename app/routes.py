@@ -1,7 +1,7 @@
 """
 The routes module for the Flask application.
 """
-from flask import redirect, url_for, request
+from flask import redirect, url_for, request, jsonify
 from flask_login import current_user, login_user
 from app import app
 from app.models import User
@@ -30,7 +30,10 @@ def login():
             'id': user.id,
             'email': user.email,
         }).decode('utf-8')
-        return token
+        return jsonify(token)
+
+    # If the user doesn't exist
+    return jsonify(error=True), 401
 
 
 
