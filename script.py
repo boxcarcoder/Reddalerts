@@ -29,7 +29,7 @@ client = Client(Config.TWILIO_ACCOUNT_SID, Config.TWILIO_AUTH_TOKEN)
 # Create test data to use with Praw and Twilio. This data will be received from the frontend as JSON.
 decodedData = {}
 decodedData["frugalmalefashion"] = [
-    "Adidas", "North Face", "Puma"]
+    "Adidas", "North Face", "Patagonia"]
 
 
 # Get rising posts that contain the user-designated keywords from the user-designated subreddit
