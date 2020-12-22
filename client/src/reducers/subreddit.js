@@ -1,10 +1,14 @@
 /* eslint-disable import/no-anonymous-default-export */
-import { SUBMIT_SUBREDDIT_INFO } from '../actions/types';
+import {
+  SUBMIT_SUBREDDIT_INFO,
+  SUBMIT_SUBREDDIT_INFO_FAIL,
+} from '../actions/types';
 
 const initialState = {
   subreddit: null,
   subreddits: [],
   loading: false,
+  error: {},
 };
 
 export default function (state = initialState, action) {
@@ -25,6 +29,11 @@ export default function (state = initialState, action) {
           },
           ...state.subreddits,
         ],
+      };
+    case SUBMIT_SUBREDDIT_INFO_FAIL:
+      return {
+        ...state,
+        error: payload,
       };
     default:
       return state;

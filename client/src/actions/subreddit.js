@@ -1,4 +1,4 @@
-import { SUBMIT_SUBREDDIT_INFO } from './types';
+import { SUBMIT_SUBREDDIT_INFO, SUBMIT_SUBREDDIT_INFO_FAIL } from './types';
 import axios from 'axios';
 
 export const submitSubredditInfo = ({
@@ -19,5 +19,10 @@ export const submitSubredditInfo = ({
       type: SUBMIT_SUBREDDIT_INFO,
       payload: res.data,
     });
-  } catch (err) {}
+  } catch (err) {
+    dispatch({
+      type: SUBMIT_SUBREDDIT_INFO_FAIL,
+      payload: { msg: err },
+    });
+  }
 };

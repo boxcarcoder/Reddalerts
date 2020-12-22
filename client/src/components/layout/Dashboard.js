@@ -1,11 +1,9 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { submitSubredditInfo } from '../../actions/subreddit';
+import DashboardTable from './DashboardTable';
 
-const Dashboard = ({
-  submitSubredditInfo,
-  subredditState: { subreddit, subreddits },
-}) => {
+const Dashboard = ({ submitSubredditInfo, subredditState: { subreddits } }) => {
   const [formData, setFormData] = useState({
     subredditName: '',
     subredditKeywords: '',
@@ -33,28 +31,9 @@ const Dashboard = ({
   };
 
   const displaySubredditTables = () => {
-    if (subreddits.length > 0) {
-      for (let i = 0; i < subreddits.length; i++) {
-        displaySubredditTable(subreddits[i]);
-      }
-    }
-  };
-
-  const displaySubredditTable = (subreddit) => {
-    return (
-      <table>
-        <thead>
-          <th colspan='2'>{subreddit.name}</th>
-        </thead>
-        <tbody>{displayKeywords(subreddit)}</tbody>
-      </table>
-    );
-  };
-
-  const displayKeywords = (subreddit) => {
-    for (let i = 0; i < subreddit.keywords.length; i++) {
-      return <tr>{subreddit.keywords[i]}</tr>;
-    }
+    return subreddits.map((subreddit) => (
+      <DashboardTable subreddit={subreddit} />
+    ));
   };
 
   return (
