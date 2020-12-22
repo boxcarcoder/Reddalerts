@@ -21,7 +21,6 @@ export const login = ({ email, password }) => async (dispatch) => {
     // Store the logged in user's token into a redux state for authentication purposes.
     const res = await axios.post('/api/login', body, config);
 
-    console.log('heard back from login api route.');
     dispatch({
       type: LOGIN_SUCCESS,
       payload: res.data,

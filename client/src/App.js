@@ -10,6 +10,7 @@ import store from './store';
 import Landing from './components/layout/Landing';
 import Register from './components/auth/Register';
 import Login from './components/auth/Login';
+import Dashboard from './components/layout/Dashboard';
 
 const App = () => {
   return (
@@ -20,6 +21,7 @@ const App = () => {
           <Switch>
             <Route exact path='/register' component={Register} />
             <Route exact path='/login' component={Login} />
+            <Route exact path='/dashboard' component={Dashboard} />
           </Switch>
         </Fragment>
       </Router>

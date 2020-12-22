@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { login } from '../../actions/auth';
 import { connect } from 'react-redux';
+import { Redirect } from 'react-router-dom';
 
-const Login = ({ login }) => {
+const Login = ({ login, authState: { isAuthenticated } }) => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -29,6 +30,10 @@ const Login = ({ login }) => {
     });
   };
 
+  if (isAuthenticated) {
+    return <Redirect to='/dashboard' />;
+  }
+
   return (
     <section>
       <h1>Login</h1>
@@ -51,4 +56,8 @@ const Login = ({ login }) => {
   );
 };
 
-export default connect(null, { login })(Login);
+const mapStateToProps = (state) => ({
+  authState: state.auth,
+});
+
+export default connect(mapStateToProps, { login })(Login);
