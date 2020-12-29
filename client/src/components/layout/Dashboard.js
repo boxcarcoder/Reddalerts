@@ -1,9 +1,21 @@
 import React, { Fragment, useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { submitSubredditInfo } from '../../actions/subreddit';
+import {
+  submitSubredditInfo,
+  fetchUserSubreddits,
+} from '../../actions/subreddit';
 import DashboardTable from './DashboardTable';
 
-const Dashboard = ({ submitSubredditInfo, subredditState: { subreddits } }) => {
+const Dashboard = ({
+  submitSubredditInfo,
+  fetchUserSubreddits,
+  subredditState: { subreddits },
+}) => {
+  // need to populate the redux state using useEffect before rendering dashboard.
+  useEffect(() => {
+    fetchUserSubreddits();
+  }, []);
+
   const [formData, setFormData] = useState({
     subredditName: '',
     subredditKeywords: '',
@@ -60,8 +72,11 @@ const Dashboard = ({ submitSubredditInfo, subredditState: { subreddits } }) => {
   );
 };
 
-const mapToStateToProps = (state) => ({
+const mapStateToProps = (state) => ({
   subredditState: state.subreddit,
 });
 
-export default connect(mapToStateToProps, { submitSubredditInfo })(Dashboard);
+export default connect(mapStateToProps, {
+  submitSubredditInfo,
+  fetchUserSubreddits,
+})(Dashboard);

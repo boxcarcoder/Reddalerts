@@ -1,4 +1,9 @@
-import { SUBMIT_SUBREDDIT_INFO, SUBMIT_SUBREDDIT_INFO_FAIL } from './types';
+import {
+  SUBMIT_SUBREDDIT_INFO,
+  SUBMIT_SUBREDDIT_INFO_FAIL,
+  FETCH_SUBREDDITS,
+  FETCH_SUBREDDITS_FAIL,
+} from './types';
 import axios from 'axios';
 
 export const submitSubredditInfo = ({
@@ -22,6 +27,22 @@ export const submitSubredditInfo = ({
   } catch (err) {
     dispatch({
       type: SUBMIT_SUBREDDIT_INFO_FAIL,
+      payload: { msg: err },
+    });
+  }
+};
+
+export const fetchUserSubreddits = () => async (dispatch) => {
+  try {
+    const res = await axios.get('/api/fetchSubredditsInfo');
+
+    dispatch({
+      type: FETCH_SUBREDDITS,
+      payload: res.data,
+    });
+  } catch (err) {
+    dispatch({
+      type: FETCH_SUBREDDITS_FAIL,
       payload: { msg: err },
     });
   }

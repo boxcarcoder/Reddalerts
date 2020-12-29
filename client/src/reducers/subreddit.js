@@ -2,6 +2,8 @@
 import {
   SUBMIT_SUBREDDIT_INFO,
   SUBMIT_SUBREDDIT_INFO_FAIL,
+  FETCH_SUBREDDITS,
+  FETCH_SUBREDDITS_FAIL,
 } from '../actions/types';
 
 const initialState = {
@@ -23,14 +25,24 @@ export default function (state = initialState, action) {
           keywords: payload.keywords,
         },
         subreddits: [
+          ...state.subreddits,
           {
             name: payload.name,
             keywords: payload.keywords,
           },
-          ...state.subreddits,
         ],
       };
     case SUBMIT_SUBREDDIT_INFO_FAIL:
+      return {
+        ...state,
+        error: payload,
+      };
+    case FETCH_SUBREDDITS:
+      return {
+        ...state,
+        subreddits: payload.subreddits,
+      };
+    case FETCH_SUBREDDITS_FAIL:
       return {
         ...state,
         error: payload,

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { register } from '../../actions/auth';
 import { connect } from 'react-redux';
+import { Redirect } from 'react-router-dom';
 
-const Register = ({ register }) => {
+const Register = ({ register, authState: { isAuthenticated } }) => {
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -13,7 +14,7 @@ const Register = ({ register }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Send the form data  to Redux action.
+    // Send the form data to Redux action.
     register({ username, email, password });
   };
 
@@ -37,6 +38,10 @@ const Register = ({ register }) => {
       password: e.target.value,
     });
   };
+
+  if (isAuthenticated) {
+    return <Redirect to='/dashboard' />;
+  }
 
   return (
     <section>
@@ -66,4 +71,8 @@ const Register = ({ register }) => {
   );
 };
 
-export default connect(null, { register })(Register);
+const mapStateToProps = (state) => ({
+  authState: state.auth,
+});
+
+export default connect(mapStateToProps, { register })(Register);
