@@ -11,12 +11,14 @@ import Landing from './components/layout/Landing';
 import Register from './components/auth/Register';
 import Login from './components/auth/Login';
 import Dashboard from './components/layout/Dashboard';
+import Navbar from './components/layout/Navbar';
 
 const App = () => {
   return (
     <Provider store={store}>
       <Router>
         <Fragment>
+          <Navbar />
           <Route exact path='/' component={Landing} />
           <Switch>
             <Route exact path='/register' component={Register} />

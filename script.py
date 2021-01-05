@@ -45,9 +45,10 @@ for submission in subreddit.rising():
 
             # Make a POST request to the Programmable Messaging API's Message endpoint in order to create a new outbound message.
             # Use the twilio-python library's create() method.
-            message = client.messages \
-                .create(
-                    body=submission.url,
-                    from_='+12058838200',
-                    to='+16263716944'
-                )
+            # message = client.messages \
+            #     .create(
+            #         body=submission.url,
+            #         from_='+12058838200',
+            #         to='+16263716944'
+            #     )
+            print('printing in place of texting.')

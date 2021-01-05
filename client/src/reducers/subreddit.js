@@ -7,7 +7,7 @@ import {
 } from '../actions/types';
 
 const initialState = {
-  subreddit: null,
+  // subreddit: null,
   subreddits: [],
   loading: false,
   error: {},
@@ -20,10 +20,10 @@ export default function (state = initialState, action) {
     case SUBMIT_SUBREDDIT_INFO:
       return {
         ...state,
-        subreddit: {
-          name: payload.name,
-          keywords: payload.keywords,
-        },
+        // subreddit: {
+        //   name: payload.name,
+        //   keywords: payload.keywords,
+        // },
         subreddits: [
           ...state.subreddits,
           {

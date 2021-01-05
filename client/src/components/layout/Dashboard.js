@@ -13,6 +13,7 @@ const Dashboard = ({
 }) => {
   // need to populate the redux state using useEffect before rendering dashboard.
   useEffect(() => {
+    console.log('useEffect: calling fetchUserSubreddits()');
     fetchUserSubreddits();
   }, []);
 
@@ -66,7 +67,7 @@ const Dashboard = ({
           onChange={handleSubredditKeywords}
         />
         <input type='submit' value='Submit' />
-        {displaySubredditTables()}
+        {/* {displaySubredditTables()} */}
       </form>
     </Fragment>
   );

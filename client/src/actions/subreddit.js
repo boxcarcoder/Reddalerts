@@ -34,13 +34,19 @@ export const submitSubredditInfo = ({
 
 export const fetchUserSubreddits = () => async (dispatch) => {
   try {
+    console.log('firing fetchUserSubreddits() action.');
     const res = await axios.get('/api/fetchSubredditsInfo');
+    console.log(
+      'res from successful firing of fetchUserSubreddits() action: ',
+      res
+    );
 
     dispatch({
       type: FETCH_SUBREDDITS,
       payload: res.data,
     });
   } catch (err) {
+    console.log('failure in fetchUserSubreddits() action.');
     dispatch({
       type: FETCH_SUBREDDITS_FAIL,
       payload: { msg: err },
