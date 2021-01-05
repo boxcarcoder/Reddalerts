@@ -10,18 +10,20 @@ from sqlalchemy.inspection import inspect
 class JsonSerializer(object):
     def serialize(self):
         dictionary = dict()
+        print('keys in this self: ', inspect(self).attrs.keys())
         for key in inspect(self).attrs.keys():
+            print('key: ', key)
             value = getattr(self, key)
             if key == 'keywords':
                 value = value.all()
             dictionary[key] = value
 
+        print('dictionary that is serialized: ', dictionary)
         return dictionary
-
+  
     @staticmethod
     def serialize_list(l):
         return [entry.serialize() for entry in l]
-
 
 """
 An association table between the users and subreddits tables to create
@@ -119,7 +121,6 @@ class Keyword(db.Model, JsonSerializer):
     def __repr__(self):
         return '<Keyword {}>'.format(self.keyword)
 
-
 @login.user_loader
 def load_user(id):
     """
@@ -128,3 +129,37 @@ def load_user(id):
     """
     print('called load_user')
     return User.query.get(int(id))
+
+
+
+# class UserJsonSerializer(JsonSerializer):
+#     """
+#     Extend the JsonSerializer class to change the users attribute from type
+#     AppenderBaseQuery to type list.
+#     """
+#     # __json_modifiers__ = {
+#     #     'users': lambda users, _: [dict(id=user.id, username=user.username, phone_num=user.phone_num) for user in users]
+#     # }
+#     pass
+
+
+# class SubredditJsonSerializer(JsonSerializer):
+#     """
+#     Extend the JsonSerializer class to change the users attribute from type
+#     AppenderBaseQuery to type list.
+#     """
+#     __json_modifiers__ = {
+#         'users': lambda users, _: [dict(id=user.id, username=user.username, phone_num=user.phone_num) for user in users]
+#         # 'subreddits': lambda subreddits, _: [dict(id=subreddit.id, subreddit_name=subreddit.subreddit_name, user_id=subreddit.user_id) for subreddit in subreddits]
+#     }
+
+
+# class KeywordJsonSerializer(JsonSerializer):
+#     """
+#     Extend the JsonSerializer class to change the users attribute from type
+#     AppenderBaseQuery to type list.
+#     """
+#     __json_modifiers__ = {
+#         'subreddits': lambda subreddits, _: [dict(id=subreddit.id, subreddit_name=subreddit.subreddit_name, user_id=subreddit.user_id) for subreddit in subreddits]
+#         # 'keywords': lambda keywords, _: [dict(id=keyword.id, keyword=keyword.keyword, subreddit_id=keyword.subreddit_id) for keyword in keywords]
+#     }

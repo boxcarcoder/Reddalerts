@@ -67,7 +67,7 @@ const Dashboard = ({
           onChange={handleSubredditKeywords}
         />
         <input type='submit' value='Submit' />
-        {/* {displaySubredditTables()} */}
+        {displaySubredditTables()}
       </form>
     </Fragment>
   );

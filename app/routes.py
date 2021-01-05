@@ -74,8 +74,16 @@ def submitSubredditInfo():
     subreddit_name = incoming["subredditName"]
     subreddit_keywords = incoming["subredditKeywords"]
 
-    # Place the subreddit name into the database
+    # Create a subreddit instance to add to the DB
     subreddit = Subreddit(subreddit_name)
+
+    # Create and add keyword instances to the subreddit instance
+    subreddit_keywords = subreddit_keywords.split(',')
+    for keyword in subreddit_keywords:
+        keyword = Keyword(keyword)
+        subreddit.keywords.append(keyword)
+        # db.session.add(keyword)
+    
     db.session.add(subreddit)
 
     try:
@@ -83,19 +91,7 @@ def submitSubredditInfo():
     except IntegrityError:
         return jsonify(message="User is monitoring this subreddit already."), 409
 
-    # Place the subreddit's keywords into the database.
-    # For each keyword in keywords, place the keyword into the database.
-    subreddit_keywords = subreddit_keywords.split(',')
-    for keyword in subreddit_keywords:
-        keyword = Keyword(keyword)
-        db.session.add(keyword)
-
-    try:
-        db.session.commit()
-    except IntegrityError:
-        return jsonify(message="These keywords are being monitored for this subreddit already."), 409
-
-    #return something for the frontend.
+    #return the subreddit name and keywords to the frontend.
     return jsonify(
         name=subreddit_name,
         keywords=subreddit_keywords
