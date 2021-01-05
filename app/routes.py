@@ -29,7 +29,10 @@ def login():
             'id': user.id,
             'email': user.email,
         }).decode('utf-8')
-        return jsonify(token)
+
+        # Return the user's username to the frontend in order to populate the loggedInUser redux state.
+        username = user.serialize()['username']
+        return jsonify(token=token, username=username)
     elif user and not user.check_password(password):
         return jsonify(error=True), 401
 
@@ -55,7 +58,7 @@ def register():
 
     new_user = User.query.filter_by(email=incoming["email"]).first()
 
-    # Generate a token for the new user to send back to the frontend for authentication purposes.    s = Serializer(app.config['SECRET_KEY'], expires_in=36000)
+    # Generate a token for the new user to send back to the frontend for authentication purposes.
     s = Serializer(app.config['SECRET_KEY'], expires_in=36000)
     token = s.dumps({
         'id': new_user.id,
@@ -63,8 +66,8 @@ def register():
     }).decode('utf-8')
 
     return jsonify(
-        id=new_user.id,
-        token=token
+        token=token,
+        username=username
     )
 
 @app.route('/api/submitSubredditInfo', methods=['POST'])
@@ -73,6 +76,10 @@ def submitSubredditInfo():
     incoming = request.get_json()
     subreddit_name = incoming["subredditName"]
     subreddit_keywords = incoming["subredditKeywords"]
+    logged_in_user = incoming["loggedInUser"]
+
+    # Query the user to append subreddits and keywords to it.  
+    user = User.query.filter_by(username=logged_in_user).one()
 
     # Create a subreddit instance to add to the DB
     subreddit = Subreddit(subreddit_name)
@@ -82,9 +89,11 @@ def submitSubredditInfo():
     for keyword in subreddit_keywords:
         keyword = Keyword(keyword)
         subreddit.keywords.append(keyword)
-        # db.session.add(keyword)
     
-    db.session.add(subreddit)
+    # Add the subreddit instance to the user instance.
+    user.subreddits.append(subreddit)
+
+    db.session.add(user)
 
     try:
         db.session.commit()

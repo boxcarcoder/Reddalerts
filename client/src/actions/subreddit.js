@@ -7,6 +7,7 @@ import {
 import axios from 'axios';
 
 export const submitSubredditInfo = ({
+  loggedInUser,
   subredditName,
   subredditKeywords,
 }) => async (dispatch) => {
@@ -17,7 +18,11 @@ export const submitSubredditInfo = ({
         'Content-Type': 'application/json',
       },
     };
-    const body = JSON.stringify({ subredditName, subredditKeywords });
+    const body = JSON.stringify({
+      loggedInUser,
+      subredditName,
+      subredditKeywords,
+    });
     const res = await axios.post('/api/submitSubredditInfo', body, config);
 
     dispatch({
