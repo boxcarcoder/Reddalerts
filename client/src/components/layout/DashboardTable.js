@@ -1,14 +1,14 @@
 import React from 'react';
 
-const DashboardTable = ({ subreddit: { name, keywords } }) => {
+const DashboardTable = ({ subreddit: { subreddit_name, keywords } }) => {
   const displayKeywords = (keywords) => {
-    return keywords.map((keyword) => <tr>{keyword}</tr>);
+    return keywords.map((keywordObj) => <tr>{keywordObj.keyword}</tr>);
   };
 
   return (
     <table>
       <thead>
-        <th colspan='2'>{name}</th>
+        <th colspan='2'>{subreddit_name}</th>
       </thead>
       <tbody>{displayKeywords(keywords)}</tbody>
     </table>

@@ -9,13 +9,9 @@ from sqlalchemy.inspection import inspect
 
 class JsonSerializer(object):
     def serialize(self):
-        print('THE SELF THAT IS BEING SERIALIZED: ', self)
         dictionary = dict()
         for key in inspect(self).attrs.keys():
-            # print('key: ', key)
             value = getattr(self, key)
-            # if key == 'keywords':
-            #     value = value.all()
             dictionary[key] = value
 
         print('dictionary that is serialized: ', dictionary)
@@ -69,6 +65,22 @@ class User(UserMixin, db.Model, JsonSerializer):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+    # """ Override serializer to handle attributes containing Flask models """
+    # def serialize(self):
+    #     dictionary = JsonSerializer.serialize(self)
+    #     # Grab the subreddit AppenderBaseQuery object assigned to subreddit
+    #     values = dictionary["subreddits"]
+
+    #     # Serialize each subreddit-AppenderBaseQuery-object into JSON format
+    #     serialized_values = []
+    #     for value in values:
+    #         serialized_values.append(value.serialize())
+    #     dictionary["subreddits"] = serialized_values
+
+    #     print('DICTIONARY AFTER REPLACING SUBREDDITS APPENDERBASE QUERY: ', dictionary)
+
+    #     return dictionary
+
 """
 An association table between the subreddits and keywords tables to create
 a many-to-many relationship.
@@ -102,14 +114,21 @@ class Subreddit(db.Model, JsonSerializer):
     def __repr__(self):
         return '<Subreddit {}>'.format(self.subreddit_name)
 
-    """ Override serializer to handle attributes containing Flask models """
+    """ Override serializer to serialize the Keywords in each Subreddit instance. Delete Users from each Subreddit since client does not need it. """
     def serialize(self):
         dictionary = JsonSerializer.serialize(self)
+        del dictionary["users"]
+
+        # Grab the AppenderBaseQuery object assigned to keywords
         values = dictionary["keywords"]
+
+        # Serialize each keyword-AppenderBaseQuery-object into JSON format
         serialized_values = []
         for value in values:
             serialized_values.append(value.serialize())
         dictionary["keywords"] = serialized_values
+
+        print('DICTIONARY AFTER REPLACING KEYWORD APPENDERBASE QUERY: ', dictionary)
         return dictionary
 
 
@@ -131,6 +150,12 @@ class Keyword(db.Model, JsonSerializer):
     """ Print function """
     def __repr__(self):
         return '<Keyword {}>'.format(self.keyword)
+
+    """ Override serializer to delete the Subreddits and Users from Keyword during serialization since we do not need to send them to the client.  """
+    def serialize(self):
+        dictionary = JsonSerializer.serialize(self)
+        del dictionary["subreddits"]
+        return dictionary
 
 @login.user_loader
 def load_user(id):
