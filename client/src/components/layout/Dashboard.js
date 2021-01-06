@@ -15,7 +15,7 @@ const Dashboard = ({
   // need to populate the redux state using useEffect before rendering dashboard.
   useEffect(() => {
     console.log('useEffect: calling fetchUserSubreddits()');
-    fetchUserSubreddits();
+    fetchUserSubreddits(loggedInUser);
   }, []);
 
   const [formData, setFormData] = useState({

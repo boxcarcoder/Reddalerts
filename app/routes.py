@@ -108,6 +108,12 @@ def submitSubredditInfo():
 
 @app.route('/api/fetchSubredditsInfo', methods=['GET'])
 def fetchSubredditsInfo():
-    subreddits = Subreddit.query.all()
-    print('subreddits from the API route.', subreddits)
-    return jsonify(subreddits=Subreddit.serialize_list(subreddits))
+    # Fetch the logged in user
+    logged_in_user = request.args.get('loggedInUser')
+    user = User.query.filter_by(username=logged_in_user).one()
+
+    # Fetch the logged in user's subreddits
+    subreddits = user.subreddits
+
+    subreddits_serialized = Subreddit.serialize_list(subreddits)
+    return jsonify(subreddits=subreddits_serialized)

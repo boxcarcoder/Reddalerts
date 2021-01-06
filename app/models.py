@@ -9,13 +9,13 @@ from sqlalchemy.inspection import inspect
 
 class JsonSerializer(object):
     def serialize(self):
+        print('THE SELF THAT IS BEING SERIALIZED: ', self)
         dictionary = dict()
-        print('keys in this self: ', inspect(self).attrs.keys())
         for key in inspect(self).attrs.keys():
-            print('key: ', key)
+            # print('key: ', key)
             value = getattr(self, key)
-            if key == 'keywords':
-                value = value.all()
+            # if key == 'keywords':
+            #     value = value.all()
             dictionary[key] = value
 
         print('dictionary that is serialized: ', dictionary)
@@ -101,6 +101,17 @@ class Subreddit(db.Model, JsonSerializer):
     """ Print function """
     def __repr__(self):
         return '<Subreddit {}>'.format(self.subreddit_name)
+
+    """ Override serializer to handle attributes containing Flask models """
+    def serialize(self):
+        dictionary = JsonSerializer.serialize(self)
+        values = dictionary["keywords"]
+        serialized_values = []
+        for value in values:
+            serialized_values.append(value.serialize())
+        dictionary["keywords"] = serialized_values
+        return dictionary
+
 
 class Keyword(db.Model, JsonSerializer):
     """
