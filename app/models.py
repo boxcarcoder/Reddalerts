@@ -151,7 +151,7 @@ class Keyword(db.Model, JsonSerializer):
     def __repr__(self):
         return '<Keyword {}>'.format(self.keyword)
 
-    """ Override serializer to delete the Subreddits and Users from Keyword during serialization since we do not need to send them to the client.  """
+    """ Override serializer to delete the Subreddits from Keyword during serialization since we do not need to send them to the client.  """
     def serialize(self):
         dictionary = JsonSerializer.serialize(self)
         del dictionary["subreddits"]

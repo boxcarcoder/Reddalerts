@@ -100,10 +100,9 @@ def submitSubredditInfo():
     except IntegrityError:
         return jsonify(message="User is monitoring this subreddit already."), 409
 
-    #return the subreddit name and keywords to the frontend.
+    #return the subreddit to the frontend.
     return jsonify(
-        name=subreddit_name,
-        keywords=subreddit_keywords
+        subreddit.serialize()
     )
 
 @app.route('/api/fetchSubredditsInfo', methods=['GET'])

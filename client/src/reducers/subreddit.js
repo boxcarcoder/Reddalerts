@@ -24,13 +24,7 @@ export default function (state = initialState, action) {
         //   name: payload.name,
         //   keywords: payload.keywords,
         // },
-        subreddits: [
-          ...state.subreddits,
-          {
-            name: payload.name,
-            keywords: payload.keywords,
-          },
-        ],
+        subreddits: [...state.subreddits, payload],
       };
     case SUBMIT_SUBREDDIT_INFO_FAIL:
       return {
