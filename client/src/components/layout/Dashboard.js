@@ -10,12 +10,13 @@ const Dashboard = ({
   submitSubredditInfo,
   fetchUserSubreddits,
   subredditState: { subreddits },
-  authState: { loggedInUser },
+  authState: {
+    loggedInUser: { username },
+  },
 }) => {
   // need to populate the redux state using useEffect before rendering dashboard.
   useEffect(() => {
-    console.log('useEffect: calling fetchUserSubreddits()');
-    fetchUserSubreddits(loggedInUser);
+    fetchUserSubreddits(username);
   }, []);
 
   const [formData, setFormData] = useState({
@@ -27,7 +28,7 @@ const Dashboard = ({
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    submitSubredditInfo({ loggedInUser, subredditName, subredditKeywords });
+    submitSubredditInfo({ username, subredditName, subredditKeywords });
   };
 
   const handleSubredditName = (e) => {

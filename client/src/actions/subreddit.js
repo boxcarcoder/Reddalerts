@@ -7,7 +7,7 @@ import {
 import axios from 'axios';
 
 export const submitSubredditInfo = ({
-  loggedInUser,
+  username,
   subredditName,
   subredditKeywords,
 }) => async (dispatch) => {
@@ -19,7 +19,7 @@ export const submitSubredditInfo = ({
       },
     };
     const body = JSON.stringify({
-      loggedInUser,
+      username,
       subredditName,
       subredditKeywords,
     });
@@ -37,25 +37,19 @@ export const submitSubredditInfo = ({
   }
 };
 
-export const fetchUserSubreddits = (loggedInUser) => async (dispatch) => {
+export const fetchUserSubreddits = (username) => async (dispatch) => {
   try {
-    console.log('firing fetchUserSubreddits() action');
     const res = await axios.get('/api/fetchSubredditsInfo', {
       params: {
-        loggedInUser,
+        username,
       },
     });
-    console.log(
-      'res from successful firing of fetchUserSubreddits() action: ',
-      res
-    );
 
     dispatch({
       type: FETCH_SUBREDDITS,
       payload: res.data,
     });
   } catch (err) {
-    console.log('failure in fetchUserSubreddits() action: ', err);
     dispatch({
       type: FETCH_SUBREDDITS_FAIL,
       payload: { msg: err },

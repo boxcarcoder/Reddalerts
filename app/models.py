@@ -14,7 +14,6 @@ class JsonSerializer(object):
             value = getattr(self, key)
             dictionary[key] = value
 
-        print('dictionary that is serialized: ', dictionary)
         return dictionary
   
     @staticmethod
@@ -65,27 +64,17 @@ class User(UserMixin, db.Model, JsonSerializer):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-    # """ Override serializer to handle attributes containing Flask models """
-    # def serialize(self):
-    #     dictionary = JsonSerializer.serialize(self)
-    #     # Grab the subreddit AppenderBaseQuery object assigned to subreddit
-    #     values = dictionary["subreddits"]
-
-    #     # Serialize each subreddit-AppenderBaseQuery-object into JSON format
-    #     serialized_values = []
-    #     for value in values:
-    #         serialized_values.append(value.serialize())
-    #     dictionary["subreddits"] = serialized_values
-
-    #     print('DICTIONARY AFTER REPLACING SUBREDDITS APPENDERBASE QUERY: ', dictionary)
-
-    #     return dictionary
+    """ Override serializer to delete Subreddits from User instances """
+    def serialize(self):
+        dictionary = JsonSerializer.serialize(self)
+        del dictionary["subreddits"]
+        return dictionary
 
 """
 An association table between the subreddits and keywords tables to create
 a many-to-many relationship.
 """
-subreddits_keywords = db.Table('subreddits_keywords',
+subreddits_keywords = db.Table('subreddits_keywords', db.Model.metadata,
     db.Column('id', db.Integer, primary_key=True),
     # Place the subreddits and keywords foreign keys in the table.
     db.Column('subreddit_id', db.Integer, db.ForeignKey('subreddits.id')),
@@ -100,7 +89,7 @@ class Subreddit(db.Model, JsonSerializer):
     __tablename__ = 'subreddits'
 
     id = db.Column(db.Integer, primary_key=True)
-    subreddit_name = db.Column(db.String(128), index=True, unique=True)
+    subreddit_name = db.Column(db.String(128), index=True)
 
     # Establish a parent-children relationship (subreddit -> keywords).
     keywords = db.relationship('Keyword', secondary=subreddits_keywords, backref='subreddits', lazy='dynamic')
@@ -128,7 +117,6 @@ class Subreddit(db.Model, JsonSerializer):
             serialized_values.append(value.serialize())
         dictionary["keywords"] = serialized_values
 
-        print('DICTIONARY AFTER REPLACING KEYWORD APPENDERBASE QUERY: ', dictionary)
         return dictionary
 
 
@@ -140,7 +128,7 @@ class Keyword(db.Model, JsonSerializer):
     __tablename__ = 'keywords'
 
     id = db.Column(db.Integer, primary_key=True)
-    keyword = db.Column(db.String(128), index=True, unique=True)
+    keyword = db.Column(db.String(128), index=True)
 
     """ Constructor """
     def __init__(self, keyword):
@@ -165,37 +153,3 @@ def load_user(id):
     """
     print('called load_user')
     return User.query.get(int(id))
-
-
-
-# class UserJsonSerializer(JsonSerializer):
-#     """
-#     Extend the JsonSerializer class to change the users attribute from type
-#     AppenderBaseQuery to type list.
-#     """
-#     # __json_modifiers__ = {
-#     #     'users': lambda users, _: [dict(id=user.id, username=user.username, phone_num=user.phone_num) for user in users]
-#     # }
-#     pass
-
-
-# class SubredditJsonSerializer(JsonSerializer):
-#     """
-#     Extend the JsonSerializer class to change the users attribute from type
-#     AppenderBaseQuery to type list.
-#     """
-#     __json_modifiers__ = {
-#         'users': lambda users, _: [dict(id=user.id, username=user.username, phone_num=user.phone_num) for user in users]
-#         # 'subreddits': lambda subreddits, _: [dict(id=subreddit.id, subreddit_name=subreddit.subreddit_name, user_id=subreddit.user_id) for subreddit in subreddits]
-#     }
-
-
-# class KeywordJsonSerializer(JsonSerializer):
-#     """
-#     Extend the JsonSerializer class to change the users attribute from type
-#     AppenderBaseQuery to type list.
-#     """
-#     __json_modifiers__ = {
-#         'subreddits': lambda subreddits, _: [dict(id=subreddit.id, subreddit_name=subreddit.subreddit_name, user_id=subreddit.user_id) for subreddit in subreddits]
-#         # 'keywords': lambda keywords, _: [dict(id=keyword.id, keyword=keyword.keyword, subreddit_id=keyword.subreddit_id) for keyword in keywords]
-#     }
