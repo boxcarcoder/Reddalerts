@@ -83,27 +83,45 @@ def submitSubredditInfo():
     # Query the user to append subreddits and keywords to it.  
     user = User.query.filter_by(username=logged_in_username).one()
 
-    # Create a subreddit instance to add to the DB
-    subreddit = Subreddit(subreddit_name)
+    # Check if the user is monitoring this subreddit already. If they are, update the subreddit with keywords.
+    if any(sr.subreddit_name == subreddit_name for sr in user.subreddits.all()): 
+        for sr in user.subreddits:
+            if sr.subreddit_name == subreddit_name:
+                subreddit = sr
+                print('subreddit did exist. using User subreddit.') 
 
-    # Create and add keyword instances to the subreddit instance
-    subreddit_keywords = subreddit_keywords.split(',')
-    for kw in subreddit_keywords:
-        keyword = Keyword(kw)
-        subreddit.keywords.append(keyword)
+                # Create and add keyword instances to the subreddit instance
+                subreddit_keywords = subreddit_keywords.split(',')
+                for kw in subreddit_keywords:
+                    keyword = Keyword(kw)
+                    subreddit.keywords.append(keyword)
 
-    # Add the subreddit instance to the user instance.
-    user.subreddits.append(subreddit) 
+                db.session.commit()       
 
-    try:
+                return jsonify(
+                    subreddit=subreddit.serialize(),
+                    update='true'
+                )    
+
+    # If they aren't, create a new subreddit instance for the user.
+    else:
+        subreddit = Subreddit(subreddit_name)
+        print('subreddit did not exist. creating Subreddit.')
+
+        # Create and add keyword instances to the subreddit instance
+        subreddit_keywords = subreddit_keywords.split(',')
+        for kw in subreddit_keywords:
+            keyword = Keyword(kw)
+            subreddit.keywords.append(keyword)
+
+        user.subreddits.append(subreddit)
+
         db.session.commit()
-    except IntegrityError:
-        return jsonify(message="User is monitoring this subreddit already."), 409
 
-    #return the subreddit to the frontend.
-    return jsonify(
-        subreddit.serialize()
-    )
+        return jsonify(
+            subreddit=subreddit.serialize(),
+            update='false'
+        )    
 
 @app.route('/api/fetchSubredditsInfo', methods=['GET'])
 def fetchSubredditsInfo():
@@ -117,3 +135,22 @@ def fetchSubredditsInfo():
 
     subreddits_serialized = Subreddit.serialize_list(subreddits)
     return jsonify(subreddits=subreddits_serialized)
+
+@app.route('/api/deleteMonitoredSubreddit', methods=['DELETE'])
+def deleteMonitoredSubreddit():
+    # Parse the incoming data
+    logged_in_username = request.args.get('username')
+    subreddit_name = request.args.get('subredditName')
+
+    # *** Remove the subreddit from the user's subreddits
+    user = User.query.filter_by(username=logged_in_username).one()
+    subreddits = [subreddit for subreddit in user.subreddits if subreddit.subreddit_name != subreddit_name]
+    user.subreddits = subreddits
+
+    # Return the new list of subreddits
+    return jsonify(subreddits = Subreddit.serialize_list(user.subreddits))
+
+
+
+
+

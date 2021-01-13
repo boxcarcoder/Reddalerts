@@ -3,6 +3,9 @@ import {
   SUBMIT_SUBREDDIT_INFO_FAIL,
   FETCH_SUBREDDITS,
   FETCH_SUBREDDITS_FAIL,
+  DELETE_SUBREDDIT,
+  DELETE_SUBREDDIT_FAIL,
+  UPDATE_SUBREDDIT_INFO,
 } from './types';
 import axios from 'axios';
 
@@ -23,12 +26,20 @@ export const submitSubredditInfo = ({
       subredditName,
       subredditKeywords,
     });
+
     const res = await axios.post('/api/submitSubredditInfo', body, config);
 
-    dispatch({
-      type: SUBMIT_SUBREDDIT_INFO,
-      payload: res.data,
-    });
+    if (res.data.update === 'true') {
+      dispatch({
+        type: UPDATE_SUBREDDIT_INFO,
+        payload: res.data,
+      });
+    } else {
+      dispatch({
+        type: SUBMIT_SUBREDDIT_INFO,
+        payload: res.data,
+      });
+    }
   } catch (err) {
     dispatch({
       type: SUBMIT_SUBREDDIT_INFO_FAIL,
@@ -54,5 +65,26 @@ export const fetchUserSubreddits = (username) => async (dispatch) => {
       type: FETCH_SUBREDDITS_FAIL,
       payload: { msg: err },
     });
+  }
+};
+
+export const deleteMonitoredSubreddit = (username, subredditName) => async (
+  dispatch
+) => {
+  try {
+    console.log('firing delete subreddit action().');
+    const res = await axios.delete('/api/deleteMonitoredSubreddit', {
+      params: {
+        username,
+        subredditName,
+      },
+    });
+
+    dispatch({
+      type: DELETE_SUBREDDIT,
+      payload: res.data,
+    });
+  } catch (err) {
+    console.log('shit: ', err);
   }
 };

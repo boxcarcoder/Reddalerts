@@ -4,10 +4,12 @@ import {
   SUBMIT_SUBREDDIT_INFO_FAIL,
   FETCH_SUBREDDITS,
   FETCH_SUBREDDITS_FAIL,
+  DELETE_SUBREDDIT,
+  DELETE_SUBREDDIT_FAIL,
+  UPDATE_SUBREDDIT_INFO,
 } from '../actions/types';
 
 const initialState = {
-  // subreddit: null,
   subreddits: [],
   loading: false,
   error: {},
@@ -20,16 +22,24 @@ export default function (state = initialState, action) {
     case SUBMIT_SUBREDDIT_INFO:
       return {
         ...state,
-        // subreddit: {
-        //   name: payload.name,
-        //   keywords: payload.keywords,
-        // },
-        subreddits: [...state.subreddits, payload],
+        subreddits: [...state.subreddits, payload.subreddit],
       };
     case SUBMIT_SUBREDDIT_INFO_FAIL:
       return {
         ...state,
         error: payload,
+      };
+    case UPDATE_SUBREDDIT_INFO:
+      return {
+        ...state,
+        subreddits: state.subreddits.map((subreddit) =>
+          subreddit.subreddit_name === payload.subreddit.subreddit_name
+            ? {
+                ...subreddit,
+                keywords: payload.subreddit.keywords,
+              }
+            : subreddit
+        ),
       };
     case FETCH_SUBREDDITS:
       return {
@@ -37,6 +47,16 @@ export default function (state = initialState, action) {
         subreddits: payload.subreddits,
       };
     case FETCH_SUBREDDITS_FAIL:
+      return {
+        ...state,
+        error: payload,
+      };
+    case DELETE_SUBREDDIT:
+      return {
+        ...state,
+        subreddits: payload.subreddits,
+      };
+    case DELETE_SUBREDDIT_FAIL:
       return {
         ...state,
         error: payload,
