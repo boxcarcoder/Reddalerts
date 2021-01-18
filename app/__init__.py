@@ -19,7 +19,7 @@ app.config.from_object(Config)
 db = SQLAlchemy(app)
 
 # Initiate a migration engine for the database using the Migrate Flask extension.
-migrate = Migrate(app, db)
+migrate = Migrate(app, db, render_as_batch=True)
 
 # Initiate a Flask-Login instance to manage user login.
 login = LoginManager(app)

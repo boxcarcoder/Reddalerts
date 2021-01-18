@@ -78,7 +78,8 @@ subreddits_keywords = db.Table('subreddits_keywords', db.Model.metadata,
     db.Column('id', db.Integer, primary_key=True),
     # Place the subreddits and keywords foreign keys in the table.
     db.Column('subreddit_id', db.Integer, db.ForeignKey('subreddits.id')),
-    db.Column('keyword_id', db.Integer, db.ForeignKey('keywords.id'))
+    db.Column('keyword_id', db.Integer, db.ForeignKey('keywords.id')),
+    db.UniqueConstraint('subreddit_id', 'keyword_id', name='UC_subreddit_id_keyword_id'),
 )
 
 class Subreddit(db.Model, JsonSerializer):

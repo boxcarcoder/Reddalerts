@@ -6,11 +6,12 @@ const DashboardTable = ({
   subreddit: { subreddit_name, keywords },
   deleteMonitoredSubreddit,
   authState: {
-    loggedInUser: { username },
+    loggedInUser: { id },
   },
 }) => {
   const handleClick = (e) => {
-    deleteMonitoredSubreddit(username, subreddit_name);
+    e.preventDefault();
+    deleteMonitoredSubreddit(id, subreddit_name);
   };
 
   const displayKeywords = (keywords) => {

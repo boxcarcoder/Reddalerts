@@ -5,7 +5,7 @@ import {
   FETCH_SUBREDDITS_FAIL,
   DELETE_SUBREDDIT,
   DELETE_SUBREDDIT_FAIL,
-  UPDATE_SUBREDDIT_INFO,
+  UPDATE_SUBREDDIT_KEYWORDS,
 } from './types';
 import axios from 'axios';
 
@@ -31,7 +31,7 @@ export const submitSubredditInfo = ({
 
     if (res.data.update === 'true') {
       dispatch({
-        type: UPDATE_SUBREDDIT_INFO,
+        type: UPDATE_SUBREDDIT_KEYWORDS,
         payload: res.data,
       });
     } else {
@@ -68,14 +68,14 @@ export const fetchUserSubreddits = (username) => async (dispatch) => {
   }
 };
 
-export const deleteMonitoredSubreddit = (username, subredditName) => async (
+export const deleteMonitoredSubreddit = (id, subredditName) => async (
   dispatch
 ) => {
   try {
     console.log('firing delete subreddit action().');
     const res = await axios.delete('/api/deleteMonitoredSubreddit', {
       params: {
-        username,
+        id,
         subredditName,
       },
     });

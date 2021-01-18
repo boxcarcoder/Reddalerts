@@ -6,7 +6,7 @@ import {
   FETCH_SUBREDDITS_FAIL,
   DELETE_SUBREDDIT,
   DELETE_SUBREDDIT_FAIL,
-  UPDATE_SUBREDDIT_INFO,
+  UPDATE_SUBREDDIT_KEYWORDS,
 } from '../actions/types';
 
 const initialState = {
@@ -29,7 +29,7 @@ export default function (state = initialState, action) {
         ...state,
         error: payload,
       };
-    case UPDATE_SUBREDDIT_INFO:
+    case UPDATE_SUBREDDIT_KEYWORDS:
       return {
         ...state,
         subreddits: state.subreddits.map((subreddit) =>

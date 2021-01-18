@@ -139,13 +139,14 @@ def fetchSubredditsInfo():
 @app.route('/api/deleteMonitoredSubreddit', methods=['DELETE'])
 def deleteMonitoredSubreddit():
     # Parse the incoming data
-    logged_in_username = request.args.get('username')
+    logged_in_user_id = request.args.get('id')
     subreddit_name = request.args.get('subredditName')
 
-    # *** Remove the subreddit from the user's subreddits
-    user = User.query.filter_by(username=logged_in_username).one()
-    subreddits = [subreddit for subreddit in user.subreddits if subreddit.subreddit_name != subreddit_name]
-    user.subreddits = subreddits
+    # Remove the subreddit from the user
+    user = User.query.get(logged_in_user_id) 
+    subreddit = user.subreddits.filter_by(subreddit_name=subreddit_name).one()
+    user.subreddits.remove(subreddit)
+    db.session.commit()
 
     # Return the new list of subreddits
     return jsonify(subreddits = Subreddit.serialize_list(user.subreddits))
