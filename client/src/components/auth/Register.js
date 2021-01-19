@@ -67,6 +67,9 @@ const Register = ({ register, authState: { isAuthenticated } }) => {
         />
         <input type='submit' value='Register' />
       </form>
+      <div>
+        Already have an account? <a href='/login'>Log In</a>
+      </div>
     </section>
   );
 };
