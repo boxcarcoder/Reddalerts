@@ -1,4 +1,5 @@
 import React, { Fragment, useState, useEffect } from 'react';
+import { Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import {
   submitSubredditInfo,
@@ -12,6 +13,7 @@ const Dashboard = ({
   subredditState: { subreddits },
   authState: {
     loggedInUser: { username },
+    isAuthenticated,
   },
 }) => {
   // need to populate the redux state using useEffect before rendering dashboard.
@@ -50,6 +52,10 @@ const Dashboard = ({
       <DashboardTable subreddit={subreddit} />
     ));
   };
+
+  if (!isAuthenticated) {
+    return <Redirect to='/register' />;
+  }
 
   return (
     <Fragment>
