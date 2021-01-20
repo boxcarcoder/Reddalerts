@@ -4,7 +4,7 @@ Models for the SQL database.
 from app import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
-from app import login
+# from app import login
 from sqlalchemy.inspection import inspect
 
 class JsonSerializer(object):
@@ -146,11 +146,11 @@ class Keyword(db.Model, JsonSerializer):
         del dictionary["subreddits"]
         return dictionary
 
-@login.user_loader
-def load_user(id):
-    """
-    Load a user given an ID for Flask-Login.
-    Flask_Login will pass an id to this function to fetch a user.
-    """
-    print('called load_user')
-    return User.query.get(int(id))
+# @login.user_loader
+# def load_user(id):
+#     """
+#     Load a user given an ID for Flask-Login.
+#     Flask_Login will pass an id to this function to fetch a user.
+#     """
+#     print('called load_user')
+#     return User.query.get(int(id))

@@ -88,7 +88,6 @@ def submitSubredditInfo():
         for sr in user.subreddits:
             if sr.subreddit_name == subreddit_name:
                 subreddit = sr
-                print('subreddit did exist. using User subreddit.') 
 
                 # Create and add keyword instances to the subreddit instance
                 subreddit_keywords = subreddit_keywords.split(',')
@@ -106,7 +105,6 @@ def submitSubredditInfo():
     # If they aren't, create a new subreddit instance for the user.
     else:
         subreddit = Subreddit(subreddit_name)
-        print('subreddit did not exist. creating Subreddit.')
 
         # Create and add keyword instances to the subreddit instance
         subreddit_keywords = subreddit_keywords.split(',')
@@ -128,7 +126,6 @@ def fetchSubredditsInfo():
     # Fetch the logged in user
     logged_in_username = request.args.get('username')
     user = User.query.filter_by(username=logged_in_username).one()
-    print('User who is fetching subreddits: ', user)
 
     # Fetch the logged in user's subreddits
     subreddits = user.subreddits
