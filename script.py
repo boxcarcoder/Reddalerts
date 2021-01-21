@@ -24,10 +24,11 @@ reddit.read_only = True
 client = Client(Config.TWILIO_ACCOUNT_SID, Config.TWILIO_AUTH_TOKEN)
 
 # Check the retrieved subreddit's rising posts for any monitored keywords.
+submissionsQueue = []
 def check_for_submissions(subreddit, monitored_keywords):
     for submission in subreddit.rising():
         for monitored_keyword in monitored_keywords:
-            if monitored_keyword.keyword in submission.title:
+            if monitored_keyword.keyword in submission.title and submission.title not in submissionsQueue:
                 # Make a POST request to the Programmable Messaging API's Message endpoint in order to create a new outbound message.
                 # Use the twilio-python library's create() method.
                 # message = client.messages \
@@ -35,7 +36,8 @@ def check_for_submissions(subreddit, monitored_keywords):
                 #         body=submission.url,
                 #         from_='+12058838200',
                 #         to='+16263716944'
-                #     )
+                #     )    
+                submissionsQueue.append(submission.title)
                 print('printing in place of texting.')
 
 # Read all users in the database, and all of their subreddits and keywords.
