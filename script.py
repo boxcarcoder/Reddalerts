@@ -21,8 +21,6 @@ reddit.read_only = True
 """ Create a twilio client. """
 client = Client(Config.TWILIO_ACCOUNT_SID, Config.TWILIO_AUTH_TOKEN)
 
-
-
 """ Periodically check for rising subreddits. """
 # Check the retrieved subreddit's rising posts for any monitored keywords.
 submissions_queue = []
@@ -38,8 +36,8 @@ def check_for_submissions(subreddit, monitored_keywords):
                 #         from_='+12058838200',
                 #         to='+16263716944'
                 #     )    
-                submissions_queue.append(submission.title)
                 print('printing in place of texting.')
+                submissions_queue.append(submission.title)
 
 # Read all users in the database, and all of their subreddits and keywords.
 def read_database():
@@ -62,32 +60,3 @@ scheduler.add_job(clear_submissions_queue, 'interval', days=1)
 
 """ Start the scheduler """
 scheduler.start()
-
-
-
-
-# # Create test data to use with Praw and Twilio. This data will be received from the frontend as JSON.
-# decodedData = {}
-# decodedData["frugalmalefashion"] = [
-#     "Adidas", "North Face", "Patagonia"]
-
-# # Get rising posts that contain the user-designated keywords from the user-designated subreddit
-# userSubreddit = list(decodedData.keys())
-# userKeywords = list(decodedData.values())[0]
-
-# subreddit = reddit.subreddit(userSubreddit[0])
-
-# for submission in subreddit.rising():
-#     for keyword in userKeywords:
-#         if keyword in submission.title:
-#             # send the submission to a messaging api to send to the user
-
-#             # Make a POST request to the Programmable Messaging API's Message endpoint in order to create a new outbound message.
-#             # Use the twilio-python library's create() method.
-#             # message = client.messages \
-#             #     .create(
-#             #         body=submission.url,
-#             #         from_='+12058838200',
-#             #         to='+16263716944'
-#             #     )
-#             print('printing in place of texting.')

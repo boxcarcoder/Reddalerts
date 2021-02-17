@@ -10,8 +10,9 @@ import store from './store';
 import Landing from './components/layout/Landing';
 import Register from './components/auth/Register';
 import Login from './components/auth/Login';
-import Dashboard from './components/layout/Dashboard';
+import Dashboard from './components/dashboard/Dashboard';
 import Navbar from './components/layout/Navbar';
+import Settings from './components/profile/Settings';
 
 const App = () => {
   return (
@@ -24,6 +25,7 @@ const App = () => {
             <Route exact path='/register' component={Register} />
             <Route exact path='/login' component={Login} />
             <Route exact path='/dashboard' component={Dashboard} />
+            <Route exact path='/Settings' component={Settings} />
           </Switch>
         </Fragment>
       </Router>

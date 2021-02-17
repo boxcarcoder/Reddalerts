@@ -148,6 +148,9 @@ def deleteMonitoredSubreddit():
     # Return the new list of subreddits
     return jsonify(subreddits = Subreddit.serialize_list(user.subreddits))
 
+@app.route('/api/submitPhoneNumber', methods=['POST'])
+def submitPhoneNumber():
+    
 
 
 
