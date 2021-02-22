@@ -1,7 +1,14 @@
 import React, { Fragment, useState } from 'react';
-import { submitPhoneNumber } from '../../actions/profile';
+import { submitPhoneNumber, deletePhoneNumber } from '../../actions/auth';
+import { connect } from 'react-redux';
 
-const Settings = () => {
+const Settings = ({
+  submitPhoneNumber,
+  deletePhoneNumber,
+  authState: {
+    loggedInUser: { id, phone_num },
+  },
+}) => {
   const [formData, setFormData] = useState({
     phoneNumber: '',
   });
@@ -10,7 +17,7 @@ const Settings = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    submitPhoneNumber(phoneNumber);
+    submitPhoneNumber({ id, phoneNumber });
   };
 
   const handlePhoneNumber = (e) => {
@@ -20,10 +27,27 @@ const Settings = () => {
     });
   };
 
+  const handleDelete = (e) => {
+    e.preventDefault();
+    deletePhoneNumber(id);
+  };
+
+  const displayCurrentPhoneNum = () => {
+    if (phone_num) {
+      return (
+        <Fragment>
+          <h4>My Phone Number: {phone_num}</h4>
+          <button onClick={(e) => handleDelete(e)}>delete</button>
+        </Fragment>
+      );
+    }
+  };
+
   return (
     <Fragment>
       <h1>ReddAlerts</h1>
       <h3>Settings</h3>
+      {displayCurrentPhoneNum()}
       <form onSubmit={handleSubmit}>
         <input
           type='text'
@@ -37,4 +61,11 @@ const Settings = () => {
   );
 };
 
-export default Settings;
+const mapStateToProps = (state) => ({
+  authState: state.auth,
+});
+
+export default connect(mapStateToProps, {
+  submitPhoneNumber,
+  deletePhoneNumber,
+})(Settings);

@@ -139,6 +139,9 @@ def deleteMonitoredSubreddit():
     logged_in_user_id = request.args.get('id')
     subreddit_name = request.args.get('subredditName')
 
+    # need to implement error handling 
+
+
     # Remove the subreddit from the user
     user = User.query.get(logged_in_user_id) 
     subreddit = user.subreddits.filter_by(subreddit_name=subreddit_name).one()
@@ -150,8 +153,38 @@ def deleteMonitoredSubreddit():
 
 @app.route('/api/submitPhoneNumber', methods=['POST'])
 def submitPhoneNumber():
-    
+    # Parse the incoming data
+    incoming = request.get_json()
+    logged_in_user_id = incoming['id']
+    phone_number = incoming['phoneNumber']
 
+    # Place the phone number into the database.
+    # need to implement error handling 
+    # test***
+    # user = User.query.filter_by(username=logged_in_username).one()
+    user = User.query.get(logged_in_user_id)
+    print('user: ', user)
+    user.phone_num = phone_number
+
+    db.session.commit()
+
+    #return something
+    return jsonify(user.serialize())
+
+@app.route('/api/deletePhoneNumber', methods=['DELETE'])
+def deletePhoneNumber():
+    # Parse the incoming data
+    logged_in_user_id = request.args.get('id')    
+
+    user = User.query.get(logged_in_user_id)
+    print('user in del phone num: ', user)
+
+    user.phone_num = None
+
+    db.session.commit()
+
+    #return something
+    return jsonify(user.serialize())
 
 
 

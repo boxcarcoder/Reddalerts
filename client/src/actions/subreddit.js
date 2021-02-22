@@ -72,7 +72,6 @@ export const deleteMonitoredSubreddit = (id, subredditName) => async (
   dispatch
 ) => {
   try {
-    console.log('firing delete subreddit action().');
     const res = await axios.delete('/api/deleteMonitoredSubreddit', {
       params: {
         id,

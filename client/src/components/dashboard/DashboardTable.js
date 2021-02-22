@@ -9,7 +9,7 @@ const DashboardTable = ({
     loggedInUser: { id },
   },
 }) => {
-  const handleClick = (e) => {
+  const handleDelete = (e) => {
     e.preventDefault();
     deleteMonitoredSubreddit(id, subreddit_name);
   };
@@ -28,7 +28,7 @@ const DashboardTable = ({
         <tr>
           <th colspan='2'>{subreddit_name}</th>
           <td>
-            <button onClick={(e) => handleClick(e)}>delete</button>
+            <button onClick={(e) => handleDelete(e)}>delete</button>
           </td>
         </tr>
       </thead>
