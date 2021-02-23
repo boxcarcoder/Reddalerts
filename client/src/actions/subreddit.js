@@ -10,7 +10,7 @@ import {
 import axios from 'axios';
 
 export const submitSubredditInfo = ({
-  username,
+  id,
   subredditName,
   subredditKeywords,
 }) => async (dispatch) => {
@@ -22,7 +22,7 @@ export const submitSubredditInfo = ({
       },
     };
     const body = JSON.stringify({
-      username,
+      id,
       subredditName,
       subredditKeywords,
     });
@@ -48,11 +48,11 @@ export const submitSubredditInfo = ({
   }
 };
 
-export const fetchUserSubreddits = (username) => async (dispatch) => {
+export const fetchUserSubreddits = (id) => async (dispatch) => {
   try {
     const res = await axios.get('/api/fetchSubredditsInfo', {
       params: {
-        username,
+        id,
       },
     });
 

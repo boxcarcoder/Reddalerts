@@ -78,10 +78,11 @@ def submitSubredditInfo():
     incoming = request.get_json()
     subreddit_name = incoming["subredditName"]
     subreddit_keywords = incoming["subredditKeywords"]
-    logged_in_username = incoming["username"]
+    logged_in_user_id = incoming["id"]
 
     # Query the user to append subreddits and keywords to it.  
-    user = User.query.filter_by(username=logged_in_username).one()
+    # user = User.query.filter_by(username=logged_in_username).one()
+    user = User.query.get(logged_in_user_id)
 
     # Check if the user is monitoring this subreddit already. If they are, update the subreddit with keywords.
     if any(sr.subreddit_name == subreddit_name for sr in user.subreddits.all()): 
@@ -124,8 +125,9 @@ def submitSubredditInfo():
 @app.route('/api/fetchSubredditsInfo', methods=['GET'])
 def fetchSubredditsInfo():
     # Fetch the logged in user
-    logged_in_username = request.args.get('username')
-    user = User.query.filter_by(username=logged_in_username).one()
+    logged_in_user_id = request.args.get('id')
+    user = User.query.get(logged_in_user_id)
+    # user = User.query.filter_by(username=logged_in_username).one()
 
     # Fetch the logged in user's subreddits
     subreddits = user.subreddits
