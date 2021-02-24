@@ -21,8 +21,6 @@ def login():
 
     # Check the database to see if the user exists. If successful, the route sends
     # a token back to the action, which stores the token into the redux state (reducer).
-
-    # ** add a check for .one()
     user = User.query.filter_by(email=email).one()
     if user and user.check_password(password):
         # Generate a token for the user to send back to the frontend for authentication purposes.
@@ -51,22 +49,18 @@ def register():
     # Place the user into the database.
     user = User(username, email, password)
     db.session.add(user)
-
     try:
         db.session.commit()
     except IntegrityError:
         return jsonify(message="User with that email already exists"), 409
 
-    new_user = User.query.filter_by(email=incoming["email"]).one()
-
     # Generate a token for the new user to send back to the frontend for authentication purposes.
+    new_user = User.query.filter_by(email=incoming["email"]).one()
     s = Serializer(app.config['SECRET_KEY'], expires_in=36000)
     token = s.dumps({
         'id': new_user.id,
         'email': new_user.email,
     }).decode('utf-8')
-
-    # Return the user to the frontend in order to populate the loggedInUser redux state.
     return jsonify(
         token=token,
         user=new_user.serialize()
@@ -81,8 +75,9 @@ def submitSubredditInfo():
     logged_in_user_id = incoming["id"]
 
     # Query the user to append subreddits and keywords to it.  
-    # user = User.query.filter_by(username=logged_in_username).one()
     user = User.query.get(logged_in_user_id)
+    if user == None:
+        return jsonify(message='User is not authorized.'), 401
 
     # Check if the user is monitoring this subreddit already. If they are, update the subreddit with keywords.
     if any(sr.subreddit_name == subreddit_name for sr in user.subreddits.all()): 
@@ -127,7 +122,8 @@ def fetchSubredditsInfo():
     # Fetch the logged in user
     logged_in_user_id = request.args.get('id')
     user = User.query.get(logged_in_user_id)
-    # user = User.query.filter_by(username=logged_in_username).one()
+    if user == None:
+        return jsonify(message='User is not authorized.'), 401
 
     # Fetch the logged in user's subreddits
     subreddits = user.subreddits
@@ -141,11 +137,11 @@ def deleteMonitoredSubreddit():
     logged_in_user_id = request.args.get('id')
     subreddit_name = request.args.get('subredditName')
 
-    # need to implement error handling 
-
-
     # Remove the subreddit from the user
     user = User.query.get(logged_in_user_id) 
+    if user == None:
+        return jsonify(message='User is not authorized.'), 401
+
     subreddit = user.subreddits.filter_by(subreddit_name=subreddit_name).one()
     user.subreddits.remove(subreddit)
     db.session.commit()
@@ -161,31 +157,27 @@ def submitPhoneNumber():
     phone_number = incoming['phoneNumber']
 
     # Place the phone number into the database.
-    # need to implement error handling 
-    # test***
-    # user = User.query.filter_by(username=logged_in_username).one()
     user = User.query.get(logged_in_user_id)
-    print('user: ', user)
+    if user == None:
+        return jsonify(message='User is not authorized.'), 401
     user.phone_num = phone_number
 
     db.session.commit()
 
-    #return something
     return jsonify(user.serialize())
 
 @app.route('/api/deletePhoneNumber', methods=['DELETE'])
 def deletePhoneNumber():
     # Parse the incoming data
     logged_in_user_id = request.args.get('id')    
-
     user = User.query.get(logged_in_user_id)
-    print('user in del phone num: ', user)
+    if user == None:
+        return jsonify(message='User is not authorized.'), 401
 
     user.phone_num = None
 
     db.session.commit()
 
-    #return something
     return jsonify(user.serialize())
 
 

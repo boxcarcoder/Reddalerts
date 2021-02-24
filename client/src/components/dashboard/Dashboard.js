@@ -59,7 +59,7 @@ const Dashboard = ({
 
   return (
     <Fragment>
-      <h1>Reddalerts</h1>
+      <h1>ReddAlerts</h1>
       <h3>Subreddits To Monitor</h3>
       <form onSubmit={handleSubmit}>
         <input

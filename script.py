@@ -24,7 +24,7 @@ client = Client(Config.TWILIO_ACCOUNT_SID, Config.TWILIO_AUTH_TOKEN)
 """ Periodically check for rising subreddits. """
 # Check the retrieved subreddit's rising posts for any monitored keywords.
 submissions_queue = []
-def check_for_submissions(subreddit, monitored_keywords):
+def check_for_submissions(user, subreddit, monitored_keywords):
     for submission in subreddit.rising():
         for monitored_keyword in monitored_keywords:
             if monitored_keyword.keyword in submission.title and submission.title not in submissions_queue:
@@ -33,7 +33,7 @@ def check_for_submissions(subreddit, monitored_keywords):
                 # message = client.messages \
                 #     .create(
                 #         body=submission.url,
-                #         from_='+12058838200',
+                #         from_='+' + user.phone_num,
                 #         to='+16263716944'
                 #     )    
                 print('printing in place of texting.')
@@ -48,7 +48,7 @@ def read_database():
         for monitored_subreddit in monitored_subreddits:
             monitored_keywords = monitored_subreddit.keywords
             subreddit = reddit.subreddit(monitored_subreddit.subreddit_name)
-            check_for_submissions(subreddit, monitored_keywords)
+            check_for_submissions(user, subreddit, monitored_keywords)
 
 scheduler.add_job(read_database, 'interval', minutes=1)
 

@@ -40,6 +40,8 @@ const Settings = ({
           <button onClick={(e) => handleDelete(e)}>delete</button>
         </Fragment>
       );
+    } else {
+      return <h4>My Phone Number: </h4>;
     }
   };
 
@@ -57,6 +59,7 @@ const Settings = ({
         />
         <input type='submit' value='Submit' />
       </form>
+      <p>Format: 1234561234</p>
     </Fragment>
   );
 };
