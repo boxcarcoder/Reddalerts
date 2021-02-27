@@ -1,0 +1,22 @@
+.landing {
+  position: relative;
+  height: 100vh;
+  text-align: center;
+  margin-top: 35px;
+}
+
+.landing h1 {
+  position: relative;
+  animation: heading;
+  animation-duration: 3s;
+  animation-fill-mode: forwards;
+}
+
+@keyframes heading {
+  0% {
+    top: -100px;
+  }
+  100% {
+    top: 10px;
+  }
+}
