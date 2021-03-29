@@ -5,10 +5,14 @@ const Landing = () => {
   return (
     <section className='landing'>
       <div className='dark-overlay'>
-        <div className='landingText'>
-          <h1>ReddAlerts</h1>
-          <Link to='/register'>Register</Link>
-          <Link to='/login'>Log In</Link>
+        <h1 className='landingHeader'>ReddAlerts</h1>
+        <div className='landingLinks'>
+          <Link to='/register' className='btn'>
+            Register
+          </Link>
+          <Link to='/login' className='btn'>
+            Log In
+          </Link>
         </div>
       </div>
     </section>
