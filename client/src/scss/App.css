@@ -1,22 +1,48 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 .landing {
   position: relative;
   height: 100vh;
   text-align: center;
-  margin-top: 35px;
+  background: url('../img/Girl-hand-laptop-working.jpeg');
+  background-size: cover;
+  background-repeat: no-repeat;
 }
 
-.landing h1 {
+.dark-overlay {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.35);
+}
+
+.landingText h1 {
+  height: 150px;
+  font-family: 'Courier New', Courier, monospace;
+  color: rgba(255, 255, 255, 0.952);
   position: relative;
-  animation: heading;
+  animation: move-header, blink-header 0.5s linear infinite;
   animation-duration: 3s;
   animation-fill-mode: forwards;
 }
 
-@keyframes heading {
+@keyframes move-header {
   0% {
     top: -100px;
   }
   100% {
-    top: 10px;
+    top: 110px;
+  }
+}
+
+@keyframes blink-header {
+  50% {
+    opacity: 0;
   }
 }
