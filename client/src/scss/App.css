@@ -2,8 +2,49 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: 'Courier New', Courier, monospace;
 }
+
+body {
+  font-family: 'Courier New', Courier, monospace;
+  text-align: center;
+  background-color: rgba(127, 214, 214, 0.945);
+  /* color: white; */
+}
+
+input[type='text'],
+input[type='email'],
+input[type='password'],
+textarea {
+  display: block;
+  width: 100%;
+  margin: 5px auto;
+  padding: 0.25rem;
+  /* margin-bottom: 10px; */
+  background-color: white;
+  /* align-content: center; */
+}
+
+/* input,
+textarea {
+  background-color: white;
+} */
+
+input[type='submit'] {
+  display: block;
+  margin: 5px auto;
+  padding: 5px;
+  color: white;
+  background-color: teal;
+}
+
+/* p {
+  text-align: left;
+} */
+
+/* h1 {
+  font-size: 45px;
+  color: rgba(255, 255, 255, 0.952);
+} */
 
 .landing {
   position: relative;
@@ -24,12 +65,14 @@
 }
 
 .landingHeader {
-  height: 150px;
   color: rgba(255, 255, 255, 0.952);
+  font-size: 45px;
+  height: 150px;
   position: relative;
   animation: move-header, blink-header 1s linear infinite;
   animation-duration: 3s;
   animation-fill-mode: forwards;
+  background-color: transparent;
 }
 
 @keyframes move-header {
@@ -37,7 +80,7 @@
     top: -100px;
   }
   100% {
-    top: 110px;
+    top: 90px;
   }
 }
 
@@ -49,11 +92,49 @@
 
 .landingLinks {
   position: relative;
+  top: 15px;
   z-index: 1;
+  background-color: transparent;
 }
 
 .btn {
   background-color: teal;
+  color: rgba(255, 255, 255, 0.952);
+  font-size: 15px;
   padding: 5px 5px;
   margin: 5px 5px;
+  border-radius: 15px;
+  text-decoration: none;
+}
+
+.registerBox {
+  /* position: relative; */
+  display: block;
+  background-color: white;
+  padding: 30px 20px;
+  margin: 20px 400px;
+  border-radius: 20px;
+  text-align: left;
+}
+
+.line {
+  height: 1px;
+  background: #ccc;
+  margin: 1.5rem 0;
+}
+
+.registerPic {
+  position: relative;
+  animation: move-register-pic;
+  animation-duration: 2s;
+  animation-fill-mode: forwards;
+}
+
+@keyframes move-register-pic {
+  0% {
+    left: -600px;
+  }
+  100% {
+    left: 0px;
+  }
 }

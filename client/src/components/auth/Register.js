@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { register } from '../../actions/auth';
 import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
+import authPic from '../../img/top-design-subreddits.jpeg';
 
 const Register = ({ register, authState: { isAuthenticated } }) => {
   const [formData, setFormData] = useState({
@@ -45,30 +46,44 @@ const Register = ({ register, authState: { isAuthenticated } }) => {
 
   return (
     <section>
-      <h1>Sign Up</h1>
-      <form onSubmit={handleSubmit}>
-        <input
-          type='text'
-          placeholder='Username'
-          onChange={handleUsername}
-          value={username}
-        />
-        <input
-          type='email'
-          placeholder='Email'
-          onChange={handleEmail}
-          value={email}
-        />
-        <input
-          type='password'
-          placeholder='Password'
-          onChange={handlePassword}
-          value={password}
-        />
-        <input type='submit' value='Register' />
-      </form>
+      <div className='registerBox'>
+        <h1>Sign Up</h1>
+        <div className='line'></div>
+
+        <form onSubmit={handleSubmit}>
+          <p>Username</p>
+          <input
+            type='text'
+            placeholder='John Doe'
+            onChange={handleUsername}
+            value={username}
+          />
+          <p>Email</p>
+          <input
+            type='email'
+            placeholder='jdoe@gmail.com'
+            onChange={handleEmail}
+            value={email}
+          />
+          <p>Password</p>
+          <input
+            type='password'
+            placeholder='********'
+            onChange={handlePassword}
+            value={password}
+          />
+          <input type='submit' value='Register' />
+        </form>
+      </div>
+
+      <img
+        src={authPic}
+        alt='register or login'
+        width='569'
+        className='registerPic'
+      />
       <div>
-        Already have an account? <a href='/login'>Log In</a>
+        Already have an account? <a href='/login'>Login</a>
       </div>
     </section>
   );
