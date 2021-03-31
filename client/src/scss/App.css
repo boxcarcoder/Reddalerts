@@ -107,10 +107,10 @@ input[type='submit'] {
   text-decoration: none;
 }
 
-.registerBox {
+.authBox {
   /* position: relative; */
   display: block;
-  background-color: white;
+  background-color: rgb(241, 241, 241);
   padding: 30px 20px;
   margin: 20px 400px;
   border-radius: 20px;
@@ -123,14 +123,14 @@ input[type='submit'] {
   margin: 1.5rem 0;
 }
 
-.registerPic {
+.authPic {
   position: relative;
-  animation: move-register-pic;
+  animation: move-auth-pic;
   animation-duration: 2s;
   animation-fill-mode: forwards;
 }
 
-@keyframes move-register-pic {
+@keyframes move-auth-pic {
   0% {
     left: -600px;
   }

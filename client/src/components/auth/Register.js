@@ -46,7 +46,7 @@ const Register = ({ register, authState: { isAuthenticated } }) => {
 
   return (
     <section>
-      <div className='registerBox'>
+      <div className='authBox'>
         <h1>Sign Up</h1>
         <div className='line'></div>
 
@@ -76,12 +76,7 @@ const Register = ({ register, authState: { isAuthenticated } }) => {
         </form>
       </div>
 
-      <img
-        src={authPic}
-        alt='register or login'
-        width='569'
-        className='registerPic'
-      />
+      <img src={authPic} alt='register' width='569' className='authPic' />
       <div>
         Already have an account? <a href='/login'>Login</a>
       </div>

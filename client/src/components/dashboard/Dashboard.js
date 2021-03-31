@@ -12,7 +12,7 @@ const Dashboard = ({
   fetchUserSubreddits,
   subredditState: { subreddits },
   authState: {
-    loggedInUser: { id, username },
+    loggedInUser: { id },
     isAuthenticated,
   },
 }) => {
