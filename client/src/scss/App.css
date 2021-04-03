@@ -1,3 +1,4 @@
+/* core styles */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -7,8 +8,12 @@
 body {
   font-family: 'Courier New', Courier, monospace;
   text-align: center;
-  background-color: rgba(127, 214, 214, 0.945);
-  /* color: white; */
+  background-color: teal;
+}
+
+a {
+  text-decoration: none;
+  color: white;
 }
 
 input[type='text'],
@@ -19,15 +24,8 @@ textarea {
   width: 100%;
   margin: 5px auto;
   padding: 0.25rem;
-  /* margin-bottom: 10px; */
   background-color: white;
-  /* align-content: center; */
 }
-
-/* input,
-textarea {
-  background-color: white;
-} */
 
 input[type='submit'] {
   display: block;
@@ -37,22 +35,28 @@ input[type='submit'] {
   background-color: teal;
 }
 
-/* p {
-  text-align: left;
-} */
+.line {
+  height: 1px;
+  background: #ccc;
+  margin: 1.5rem 0;
+}
 
-/* h1 {
-  font-size: 45px;
+.btn {
+  background-color: teal;
   color: rgba(255, 255, 255, 0.952);
-} */
+  font-size: 15px;
+  padding: 5px 5px;
+  margin: 5px 5px;
+  border-radius: 15px;
+}
 
-.landing {
-  position: relative;
-  height: 100vh;
-  text-align: center;
-  background: url('../img/Girl-hand-laptop-working.jpeg');
-  background-size: cover;
-  background-repeat: no-repeat;
+.deleteBtn {
+  background-color: rgb(245, 65, 45);
+  color: rgba(255, 255, 255, 0.952);
+  font-size: 15px;
+  padding: 2px 5px;
+  margin: 5px 5px;
+  border-radius: 15px;
 }
 
 .dark-overlay {
@@ -64,18 +68,45 @@ input[type='submit'] {
   background-color: rgba(0, 0, 0, 0.35);
 }
 
+.smallText {
+  font-size: small;
+}
+
+/* navbar styles */
+.navbar {
+  text-align: right;
+  margin: 5px 5px;
+  padding: 5px 5px;
+  background-color: rgba(0, 0, 0, 0.473);
+}
+
+.navbar > a {
+  color: rgba(255, 255, 255, 0.952);
+  margin: 10px 10px;
+}
+
+/* landing page styles */
+.landing {
+  position: relative;
+  height: 100vh;
+  text-align: center;
+  background: url('../img/Girl-hand-laptop-working.jpeg');
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
 .landingHeader {
   color: rgba(255, 255, 255, 0.952);
   font-size: 45px;
   height: 150px;
   position: relative;
-  animation: move-header, blink-header 1s linear infinite;
+  animation: move-landing-header, blink-header 1s linear infinite;
   animation-duration: 3s;
   animation-fill-mode: forwards;
   background-color: transparent;
 }
 
-@keyframes move-header {
+@keyframes move-landing-header {
   0% {
     top: -100px;
   }
@@ -97,30 +128,13 @@ input[type='submit'] {
   background-color: transparent;
 }
 
-.btn {
-  background-color: teal;
-  color: rgba(255, 255, 255, 0.952);
-  font-size: 15px;
-  padding: 5px 5px;
-  margin: 5px 5px;
-  border-radius: 15px;
-  text-decoration: none;
-}
-
+/* register and login page styles */
 .authBox {
-  /* position: relative; */
-  display: block;
   background-color: rgb(241, 241, 241);
   padding: 30px 20px;
   margin: 20px 400px;
   border-radius: 20px;
   text-align: left;
-}
-
-.line {
-  height: 1px;
-  background: #ccc;
-  margin: 1.5rem 0;
 }
 
 .authPic {
@@ -138,3 +152,42 @@ input[type='submit'] {
     left: 0px;
   }
 }
+
+/* dashboard styles */
+.submissionBox {
+  background-color: rgb(241, 241, 241);
+  padding: 30px 20px;
+  margin: 20px 400px;
+  border-radius: 20px;
+  text-align: left;
+}
+
+.dashboardHeader {
+  color: rgba(255, 255, 255, 0.952);
+  font-size: 45px;
+  position: relative;
+  animation: blink-header 1s linear infinite;
+  animation-duration: 3s;
+  animation-fill-mode: forwards;
+  background-color: transparent;
+}
+
+/* monitored subreddit table styles */
+.subredditTableAndDeleteBtn {
+  margin: 30px 0px;
+}
+
+.subredditTable {
+  background-color: rgba(255, 255, 255, 0.952);
+  display: inline-block;
+  text-align: center;
+  border-radius: 6px;
+}
+
+.subredditTable div.line {
+  height: 1px;
+  background: #ccc;
+  margin: 0.1rem 0;
+}
+
+/* .subredditTableDeleteBtn button.deleteBtn {} */

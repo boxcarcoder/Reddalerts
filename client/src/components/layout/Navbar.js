@@ -11,13 +11,15 @@ const Navbar = ({ authState: { isAuthenticated }, logout }) => {
   return (
     <Fragment>
       {isAuthenticated ? (
-        <Fragment>
-          <Link to='/dashboard'>Dashboard</Link>
-          <Link to='/settings'>Settings</Link>
-          <a onClick={(e) => handleLogout(e)} href='/register'>
-            Logout
-          </a>
-        </Fragment>
+        <div className='navbar'>
+          <Fragment>
+            <Link to='/dashboard'>Dashboard</Link>
+            <Link to='/settings'>Settings</Link>
+            <a onClick={(e) => handleLogout(e)} href='/register'>
+              Logout
+            </a>
+          </Fragment>
+        </div>
       ) : null}
     </Fragment>
   );

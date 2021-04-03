@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import { deleteMonitoredSubreddit } from '../../actions/subreddit';
 import { connect } from 'react-redux';
 
@@ -23,17 +23,24 @@ const DashboardTable = ({
   };
 
   return (
-    <table>
-      <thead>
-        <tr>
-          <th colspan='2'>{subreddit_name}</th>
-          <td>
-            <button onClick={(e) => handleDelete(e)}>delete</button>
-          </td>
-        </tr>
-      </thead>
-      <tbody>{displayKeywords(keywords)}</tbody>
-    </table>
+    <Fragment>
+      <div className='subredditTableAndDeleteBtn'>
+        <table className='subredditTable'>
+          <thead>
+            <tr>
+              <th colspan='2'>{subreddit_name}</th>
+            </tr>
+            <tr>
+              <div className='line' />
+            </tr>
+          </thead>
+          <tbody>{displayKeywords(keywords)}</tbody>
+        </table>
+        <button className='deleteBtn' onClick={(e) => handleDelete(e)}>
+          Delete
+        </button>
+      </div>
+    </Fragment>
   );
 };
 

@@ -59,24 +59,35 @@ const Dashboard = ({
 
   return (
     <Fragment>
-      <h1>ReddAlerts</h1>
-      <h3>Subreddits To Monitor</h3>
-      <form onSubmit={handleSubmit}>
-        <input
-          type='text'
-          placeholder='Subreddit'
-          value={subredditName}
-          onChange={handleSubredditName}
-        />
-        <input
-          type='text'
-          placeholder='Keywords'
-          value={subredditKeywords}
-          onChange={handleSubredditKeywords}
-        />
-        <input type='submit' value='Submit' />
-        {displaySubredditTables()}
-      </form>
+      <h1 className='dashboardHeader'>ReddAlerts</h1>
+      <div className='submissionBox'>
+        <h2>Subreddits To Monitor</h2>
+        <div className='line'></div>
+        <form onSubmit={handleSubmit}>
+          <p>Subreddit (/r/)</p>
+          <input
+            type='text'
+            placeholder='technology'
+            value={subredditName}
+            onChange={handleSubredditName}
+          />
+          <p className='smallText'>One subreddit per submission.</p>
+          <div className='line'></div>
+
+          <p>Keywords</p>
+          <input
+            type='text'
+            placeholder='javascript, reactjs'
+            value={subredditKeywords}
+            onChange={handleSubredditKeywords}
+          />
+          <p className='smallText'>Comma separated list.</p>
+
+          <input type='submit' value='Submit' />
+        </form>
+      </div>
+
+      {displaySubredditTables()}
     </Fragment>
   );
 };

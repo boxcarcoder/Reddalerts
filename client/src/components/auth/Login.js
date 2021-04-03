@@ -39,6 +39,7 @@ const Login = ({ login, authState: { isAuthenticated } }) => {
     <section>
       <div className='authBox'>
         <h1>Login</h1>
+        <div className='line'></div>
         <form onSubmit={handleSubmit}>
           <input
             type='email'
