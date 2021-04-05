@@ -48,6 +48,13 @@ input[type='submit'] {
   padding: 5px 5px;
   margin: 5px 5px;
   border-radius: 15px;
+  opacity: 1;
+  border-style: solid;
+  border-width: 0.1em;
+}
+
+.btn:hover {
+  opacity: 1.5;
 }
 
 .deleteBtn {
@@ -62,7 +69,7 @@ input[type='submit'] {
 .dark-overlay {
   height: 100%;
   width: 100%;
-  position: relative;
+  /* position: relative; */
   top: 0;
   left: 0;
   background-color: rgba(0, 0, 0, 0.35);
@@ -108,7 +115,7 @@ input[type='submit'] {
 .landingHeader {
   color: rgba(255, 255, 255, 0.952);
   font-size: 45px;
-  height: 150px;
+  /* height: 150px; */
   position: relative;
   animation: move-landing-header, blink-header 1s linear infinite;
   animation-duration: 3s;
@@ -133,9 +140,43 @@ input[type='submit'] {
 
 .landingLinks {
   position: relative;
-  top: 15px;
-  z-index: 1;
+  top: 100px;
+  /* z-index: 1; */
   background-color: transparent;
+  display: block;
+}
+
+.readMe {
+  background-color: rgb(241, 241, 241);
+  margin: 0px 500px;
+  padding: 10px 10px;
+  border-radius: 20px;
+  top: 200px;
+  position: relative;
+  display: block;
+  opacity: 0.5;
+  animation: move-readme;
+  animation-duration: 3s;
+  animation-fill-mode: forwards;
+}
+
+@keyframes move-readme {
+  0% {
+    top: 800px;
+  }
+  100% {
+    top: 200px;
+  }
+}
+
+.readMe:hover {
+  opacity: 1;
+}
+
+.readMe div.line {
+  height: 1px;
+  background: #ccc;
+  margin: 0.5rem 0;
 }
 
 /* register and login page styles */
@@ -152,6 +193,7 @@ input[type='submit'] {
   animation: move-auth-pic;
   animation-duration: 2s;
   animation-fill-mode: forwards;
+  border-radius: 15px;
 }
 
 @keyframes move-auth-pic {
@@ -206,9 +248,3 @@ input[type='submit'] {
 .phoneNumDeleteBtn {
   margin: 0px 10px;
 }
-
-/* .sectionBox div.line {
-  height: 1px;
-  background: #ccc;
-  margin: 0.5rem 0;
-} */
