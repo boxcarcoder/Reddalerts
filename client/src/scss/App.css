@@ -72,6 +72,16 @@ input[type='submit'] {
   font-size: small;
 }
 
+.defaultHeader {
+  color: rgba(255, 255, 255, 0.952);
+  font-size: 45px;
+  position: relative;
+  animation: blink-header 1s linear infinite;
+  animation-duration: 3s;
+  animation-fill-mode: forwards;
+  background-color: transparent;
+}
+
 /* navbar styles */
 .navbar {
   text-align: right;
@@ -162,23 +172,12 @@ input[type='submit'] {
   text-align: left;
 }
 
-.dashboardHeader {
-  color: rgba(255, 255, 255, 0.952);
-  font-size: 45px;
-  position: relative;
-  animation: blink-header 1s linear infinite;
-  animation-duration: 3s;
-  animation-fill-mode: forwards;
-  background-color: transparent;
-}
-
-/* monitored subreddit table styles */
 .subredditTableAndDeleteBtn {
   margin: 30px 0px;
 }
 
 .subredditTable {
-  background-color: rgba(255, 255, 255, 0.952);
+  background-color: rgb(241, 241, 241);
   display: inline-block;
   text-align: center;
   border-radius: 6px;
@@ -190,4 +189,26 @@ input[type='submit'] {
   margin: 0.1rem 0;
 }
 
-/* .subredditTableDeleteBtn button.deleteBtn {} */
+/* settings page styles */
+.sectionBox {
+  padding: 30px 20px;
+  margin: 20px 400px;
+  background-color: rgb(241, 241, 241);
+  border-radius: 20px;
+  text-align: left;
+}
+
+.phoneNumAndDeleteBtn {
+  display: flex;
+  margin: 5px 5px;
+}
+
+.phoneNumDeleteBtn {
+  margin: 0px 10px;
+}
+
+/* .sectionBox div.line {
+  height: 1px;
+  background: #ccc;
+  margin: 0.5rem 0;
+} */

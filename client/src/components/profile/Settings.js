@@ -36,30 +36,44 @@ const Settings = ({
     if (phone_num) {
       return (
         <Fragment>
-          <h4>My Phone Number: {phone_num}</h4>
-          <button onClick={(e) => handleDelete(e)}>delete</button>
+          <div className='phoneNumAndDeleteBtn'>
+            <h4>My Phone Number: {phone_num}</h4>
+            <button
+              className='phoneNumDeleteBtn'
+              onClick={(e) => handleDelete(e)}
+            >
+              Delete
+            </button>
+          </div>
         </Fragment>
       );
     } else {
-      return <h4>My Phone Number: </h4>;
+      return (
+        <div className='phoneNumAndDeleteBtn'>
+          <h4>My Phone Number: </h4>
+        </div>
+      );
     }
   };
 
   return (
     <Fragment>
-      <h1>ReddAlerts</h1>
-      <h3>Settings</h3>
-      {displayCurrentPhoneNum()}
-      <form onSubmit={handleSubmit}>
-        <input
-          type='text'
-          placeholder='Phone Number'
-          value={phoneNumber}
-          onChange={handlePhoneNumber}
-        />
-        <input type='submit' value='Submit' />
-      </form>
-      <p>Format: 1234561234</p>
+      <h1 className='defaultHeader'>ReddAlerts</h1>
+      <div className='sectionBox'>
+        <h2>Settings</h2>
+        <div className='line' />
+        {displayCurrentPhoneNum()}
+        <form onSubmit={handleSubmit}>
+          <input
+            type='text'
+            placeholder='Phone Number'
+            value={phoneNumber}
+            onChange={handlePhoneNumber}
+          />
+          <input type='submit' value='Submit' />
+        </form>
+        <p>Format: 12225555555</p>
+      </div>
     </Fragment>
   );
 };

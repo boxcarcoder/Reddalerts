@@ -59,7 +59,7 @@ const Dashboard = ({
 
   return (
     <Fragment>
-      <h1 className='dashboardHeader'>ReddAlerts</h1>
+      <h1 className='defaultHeader'>ReddAlerts</h1>
       <div className='submissionBox'>
         <h2>Subreddits To Monitor</h2>
         <div className='line'></div>
