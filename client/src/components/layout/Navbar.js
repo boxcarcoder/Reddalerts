@@ -13,7 +13,7 @@ const Navbar = ({ authState: { isAuthenticated }, logout }) => {
       {isAuthenticated ? (
         <div className='navbar'>
           <Fragment>
-            <Link to='/dashboard'>Dashboard</Link>
+            <Link to='/dashboard'>Subreddits</Link>
             <Link to='/settings'>Settings</Link>
             <a onClick={(e) => handleLogout(e)} href='/register'>
               Logout

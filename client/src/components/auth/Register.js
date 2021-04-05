@@ -41,7 +41,7 @@ const Register = ({ register, authState: { isAuthenticated } }) => {
   };
 
   if (isAuthenticated) {
-    return <Redirect to='/dashboard' />;
+    return <Redirect to='/settings' />;
   }
 
   return (
