@@ -184,8 +184,8 @@ input[type='submit'] {
 /* register and login page styles */
 .authBox {
   background-color: rgb(241, 241, 241);
-  padding: 30px 20px;
-  margin: 20px 400px;
+  padding: 2% 2%;
+  margin: 5% 30%;
   border-radius: 20px;
   text-align: left;
 }
@@ -200,10 +200,10 @@ input[type='submit'] {
 
 @keyframes move-auth-pic {
   0% {
-    left: -600px;
+    left: -100%;
   }
   100% {
-    left: 0px;
+    left: 0%;
   }
 }
 
