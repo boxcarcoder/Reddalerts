@@ -72,7 +72,7 @@ const Settings = ({
           />
           <input type='submit' value='Submit' />
         </form>
-        <p>Format: 12225555555</p>
+        <p>Format: (555)555-5555</p>
       </div>
     </Fragment>
   );

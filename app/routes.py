@@ -7,6 +7,7 @@ from app import app, db
 from app.models import User, Subreddit, Keyword
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from sqlalchemy.exc import IntegrityError
+from . import helpers
 
 @app.route('/')
 
@@ -155,6 +156,12 @@ def submitPhoneNumber():
     incoming = request.get_json()
     logged_in_user_id = incoming['id']
     phone_number = incoming['phoneNumber']
+
+    # Check if the phone number format is correct.
+    contains_letters = helpers.checkPhoneNumberFormat(phone_number)
+    if contains_letters == True:
+        return jsonify(message="Phone number is not formatted correctly."), 400
+    
 
     # Place the phone number into the database.
     user = User.query.get(logged_in_user_id)

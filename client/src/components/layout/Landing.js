@@ -18,8 +18,8 @@ const Landing = () => {
           <p>Register to start monitoring Subreddits.</p>
           <div className='line' />
           <p>
-            Specify a subreddit you wish to monitor, and any keyword(s) of
-            interest for that Subreddit.
+            Specify a subreddit you wish to monitor, and keyword(s) of interest
+            for that Subreddit.
           </p>
           <div className='line' />
           <p>

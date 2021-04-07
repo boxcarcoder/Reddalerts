@@ -9,6 +9,7 @@ body {
   font-family: 'Courier New', Courier, monospace;
   text-align: center;
   background-color: teal;
+  height: 100%;
 }
 
 a {
@@ -69,10 +70,10 @@ input[type='submit'] {
 .dark-overlay {
   height: 100%;
   width: 100%;
-  /* position: relative; */
   top: 0;
   left: 0;
   background-color: rgba(0, 0, 0, 0.35);
+  overflow: scroll;
 }
 
 .smallText {
@@ -108,14 +109,15 @@ input[type='submit'] {
   height: 100vh;
   text-align: center;
   background: url('../img/Girl-hand-laptop-working.jpeg');
+  background-position: center center;
   background-size: cover;
   background-repeat: no-repeat;
+  background-attachment: fixed;
 }
 
 .landingHeader {
   color: rgba(255, 255, 255, 0.952);
   font-size: 45px;
-  /* height: 150px; */
   position: relative;
   animation: move-landing-header, blink-header 1s linear infinite;
   animation-duration: 3s;
@@ -125,10 +127,10 @@ input[type='submit'] {
 
 @keyframes move-landing-header {
   0% {
-    top: -100px;
+    top: -10%;
   }
   100% {
-    top: 90px;
+    top: 10%;
   }
 }
 
@@ -140,18 +142,18 @@ input[type='submit'] {
 
 .landingLinks {
   position: relative;
-  top: 100px;
-  /* z-index: 1; */
+  top: 12%;
   background-color: transparent;
   display: block;
 }
 
 .readMe {
   background-color: rgb(241, 241, 241);
-  margin: 0px 500px;
-  padding: 10px 10px;
+  display: flex;
+  flex-direction: column;
+  margin: 0% 20%;
+  padding: 1% 1%;
   border-radius: 20px;
-  top: 200px;
   position: relative;
   display: block;
   opacity: 0.5;
@@ -162,10 +164,10 @@ input[type='submit'] {
 
 @keyframes move-readme {
   0% {
-    top: 800px;
+    top: 110%;
   }
   100% {
-    top: 200px;
+    top: 20%;
   }
 }
 
