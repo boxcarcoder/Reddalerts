@@ -185,7 +185,7 @@ input[type='submit'] {
 .authBox {
   background-color: rgb(241, 241, 241);
   padding: 2% 2%;
-  margin: 5% 30%;
+  margin: 2% 30%;
   border-radius: 20px;
   text-align: left;
 }
@@ -210,14 +210,14 @@ input[type='submit'] {
 /* dashboard styles */
 .submissionBox {
   background-color: rgb(241, 241, 241);
-  padding: 30px 20px;
-  margin: 20px 400px;
+  padding: 2% 2%;
+  margin: 2% 30%;
   border-radius: 20px;
   text-align: left;
 }
 
 .subredditTableAndDeleteBtn {
-  margin: 30px 0px;
+  margin: 2% auto;
 }
 
 .subredditTable {
@@ -235,8 +235,8 @@ input[type='submit'] {
 
 /* settings page styles */
 .sectionBox {
-  padding: 30px 20px;
-  margin: 20px 400px;
+  padding: 2% 2%;
+  margin: 2% 30%;
   background-color: rgb(241, 241, 241);
   border-radius: 20px;
   text-align: left;
