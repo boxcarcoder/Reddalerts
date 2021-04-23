@@ -73,6 +73,7 @@ const Settings = ({
           <input type='submit' value='Submit' />
         </form>
         <p>Format: (555)555-5555</p>
+        <p className='smallText'>U.S. phone numbers only.</p>
       </div>
     </Fragment>
   );

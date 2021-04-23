@@ -157,17 +157,14 @@ def submitPhoneNumber():
     logged_in_user_id = incoming['id']
     phone_number = incoming['phoneNumber']
 
-    # Check if the phone number format is correct.
-    contains_letters = helpers.checkPhoneNumberFormat(phone_number)
-    if contains_letters == True:
-        return jsonify(message="Phone number is not formatted correctly."), 400
-    
+    # Format the phone number to be stored consistently.
+    correctFormatPhoneNum = helpers.formatPhoneNum(phone_number)
 
     # Place the phone number into the database.
     user = User.query.get(logged_in_user_id)
     if user == None:
         return jsonify(message='User is not authorized.'), 401
-    user.phone_num = phone_number
+    user.phone_num = correctFormatPhoneNum
 
     db.session.commit()
 
