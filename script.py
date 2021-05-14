@@ -37,12 +37,12 @@ def check_for_submissions(user, subreddit, monitored_keywords):
                 #         to='+16263716944'
                 #     )    
                 ##############
-                # message = client.messages \
-                #     .create(
-                #         body=submission.url,
-                #         from_='+12058838200',
-                #         to='+1' + user.phone_num
-                #     )   
+                message = client.messages \
+                    .create(
+                        body=submission.url,
+                        from_='+14256573687',
+                        to='+1' + user.phone_num
+                    )   
                 print('printing in place of texting.')
                 submissions_queue.append(submission.title)
 
