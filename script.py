@@ -3,11 +3,12 @@ from config import Config
 from twilio.rest import Client
 
 # The Flask application
-from app import app, db, scheduler
+from app.application import application
+from app.extensions import db, scheduler
 from app.models import User, Subreddit, Keyword
 
 """ Creating the Flask instances for a shell context. """
-@app.shell_context_processor
+@application.shell_context_processor
 def make_shell_context():
     return {'db': db, 'User': User, 'Subreddit': Subreddit, 'Keyword': Keyword}
 

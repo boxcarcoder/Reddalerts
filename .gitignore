@@ -4,3 +4,7 @@ config.py
 .vscode/
 .DS_Store
 app.db
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml

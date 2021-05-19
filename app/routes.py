@@ -1,20 +1,23 @@
 """
 The routes module for the Flask application.
 """
-from flask import redirect, url_for, request, jsonify
-from flask_login import current_user, login_user
-from app import app, db
+from flask import request, jsonify
+from app.application import application
+from app.extensions import db
 from app.models import User, Subreddit, Keyword
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from sqlalchemy.exc import IntegrityError
-from . import helpers
+import re
+from functools import wraps
 
-@app.route('/')
+# @application.route('/')
 
-@app.route('/index')
+# @application.route('/index')
 
-@app.route('/api/login', methods=['POST'])
+@application.route('/api/login', methods=['POST'])
 def login():
+    # return 'hello world'
+
     # Parse the incoming request
     incoming = request.get_json()
     email = incoming["email"]
@@ -25,7 +28,7 @@ def login():
     user = User.query.filter_by(email=email).one()
     if user and user.check_password(password):
         # Generate a token for the user to send back to the frontend for authentication purposes.
-        s = Serializer(app.config['SECRET_KEY'], expires_in=36000)
+        s = Serializer(application.config['SECRET_KEY'], expires_in=36000)
         token = s.dumps({
             'id': user.id,
             'email': user.email,
@@ -39,7 +42,7 @@ def login():
     # If the user doesn't exist
     return jsonify(error=True), 404
 
-@app.route('/api/register', methods=['POST'])
+@application.route('/api/register', methods=['POST'])
 def register():
     # Parse the incoming request
     incoming = request.get_json()
@@ -57,7 +60,7 @@ def register():
 
     # Generate a token for the new user to send back to the frontend for authentication purposes.
     new_user = User.query.filter_by(email=incoming["email"]).one()
-    s = Serializer(app.config['SECRET_KEY'], expires_in=36000)
+    s = Serializer(application.config['SECRET_KEY'], expires_in=36000)
     token = s.dumps({
         'id': new_user.id,
         'email': new_user.email,
@@ -67,7 +70,7 @@ def register():
         user=new_user.serialize()
     )
 
-@app.route('/api/submitSubredditInfo', methods=['POST'])
+@application.route('/api/submitSubredditInfo', methods=['POST'])
 def submitSubredditInfo():
     # Parse the incoming data
     incoming = request.get_json()
@@ -118,7 +121,7 @@ def submitSubredditInfo():
             update='false'
         )    
 
-@app.route('/api/fetchSubredditsInfo', methods=['GET'])
+@application.route('/api/fetchSubredditsInfo', methods=['GET'])
 def fetchSubredditsInfo():
     # Fetch the logged in user
     logged_in_user_id = request.args.get('id')
@@ -132,7 +135,7 @@ def fetchSubredditsInfo():
     subreddits_serialized = Subreddit.serialize_list(subreddits)
     return jsonify(subreddits=subreddits_serialized)
 
-@app.route('/api/deleteMonitoredSubreddit', methods=['DELETE'])
+@application.route('/api/deleteMonitoredSubreddit', methods=['DELETE'])
 def deleteMonitoredSubreddit():
     # Parse the incoming data
     logged_in_user_id = request.args.get('id')
@@ -150,7 +153,7 @@ def deleteMonitoredSubreddit():
     # Return the new list of subreddits
     return jsonify(subreddits = Subreddit.serialize_list(user.subreddits))
 
-@app.route('/api/submitPhoneNumber', methods=['POST'])
+@application.route('/api/submitPhoneNumber', methods=['POST'])
 def submitPhoneNumber():
     # Parse the incoming data
     incoming = request.get_json()
@@ -158,7 +161,7 @@ def submitPhoneNumber():
     phone_number = incoming['phoneNumber']
 
     # Format the phone number to be stored consistently.
-    correctFormatPhoneNum = helpers.formatPhoneNum(phone_number)
+    correctFormatPhoneNum = re.sub('[^0-9]', '', phone_number)
 
     # Place the phone number into the database.
     user = User.query.get(logged_in_user_id)
@@ -170,7 +173,7 @@ def submitPhoneNumber():
 
     return jsonify(user.serialize())
 
-@app.route('/api/deletePhoneNumber', methods=['DELETE'])
+@application.route('/api/deletePhoneNumber', methods=['DELETE'])
 def deletePhoneNumber():
     # Parse the incoming data
     logged_in_user_id = request.args.get('id')    
