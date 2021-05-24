@@ -13,5 +13,6 @@ application = Flask(__name__)
 # Assign configurations to the application object.
 application.config.from_object(Config)
 
-# # Import routes at the end to avoid circular import.
-# from app import public
+# Import the public module which contains views.
+# Import at the end to avoid circular import.
+from app import public
