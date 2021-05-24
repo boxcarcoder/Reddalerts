@@ -2,13 +2,12 @@
 The routes module for the Flask application.
 """
 from flask import request, jsonify
-from app.application import application
 from app.extensions import db
+from app.application import application
 from app.models import User, Subreddit, Keyword
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from sqlalchemy.exc import IntegrityError
 import re
-from functools import wraps
 
 # @application.route('/')
 
@@ -16,8 +15,6 @@ from functools import wraps
 
 @application.route('/api/login', methods=['POST'])
 def login():
-    # return 'hello world'
-
     # Parse the incoming request
     incoming = request.get_json()
     email = incoming["email"]
