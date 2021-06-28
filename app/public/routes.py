@@ -8,12 +8,14 @@ from app.models import User, Subreddit, Keyword
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from sqlalchemy.exc import IntegrityError
 import re
+# from flask_cors import cross_origin
 
-# @application.route('/')
+@application.route('/')
 
-# @application.route('/index')
+@application.route('/index')
 
 @application.route('/api/login', methods=['POST'])
+# @cross_origin(supports_credentials=True)
 def login():
     # Parse the incoming request
     incoming = request.get_json()

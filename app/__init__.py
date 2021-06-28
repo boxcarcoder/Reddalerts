@@ -1,4 +1,4 @@
 """
-The basis for my /app package.
+The app module.
 """
 

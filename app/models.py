@@ -3,7 +3,6 @@ Models for the SQL database.
 """
 from app.extensions import db
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import UserMixin
 from sqlalchemy.inspection import inspect
 
 class JsonSerializer(object):
@@ -30,7 +29,7 @@ users_subreddits = db.Table('users_subreddits',
     db.Column('subreddit_id', db.Integer, db.ForeignKey('subreddits.id'))
 )
 
-class User(UserMixin, db.Model, JsonSerializer):
+class User(db.Model, JsonSerializer):
     """
     The users table.
     """
@@ -145,11 +144,3 @@ class Keyword(db.Model, JsonSerializer):
         del dictionary["subreddits"]
         return dictionary
 
-# @login.user_loader
-# def load_user(id):
-#     """
-#     Load a user given an ID for Flask-Login.
-#     Flask_Login will pass an id to this function to fetch a user.
-#     """
-#     print('called load_user')
-#     return User.query.get(int(id))

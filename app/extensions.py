@@ -5,7 +5,7 @@ from app.application import application
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from apscheduler.schedulers.background import BackgroundScheduler
-
+from flaskext.mysql import MySQL
 
 # Initiate a DB instance using the SQLAlchemy Flask extension.
 db = SQLAlchemy(application)
@@ -15,3 +15,7 @@ migrate = Migrate(application, db, render_as_batch=True)
 
 # Initiate a background scheduler.
 scheduler = BackgroundScheduler(daemon=True) 
+
+# # Initiate a MySQL extension.
+# mysql = MySQL()
+# mysql.init_app(application)
