@@ -9,6 +9,8 @@ from flaskext.mysql import MySQL
 
 # Initiate a DB instance using the SQLAlchemy Flask extension.
 db = SQLAlchemy(application)
+# Create an initial database including all tables (at the database at my config's DB URI?)
+db.create_all()
 
 # Initiate a migration engine for the database using the Migrate Flask extension.
 migrate = Migrate(application, db, render_as_batch=True)
