@@ -7,6 +7,9 @@ from app.application import application
 from app.extensions import db, scheduler
 from app.models import User, Subreddit, Keyword
 
+""" Create initial database designated by the DB URI, including all tables """
+db.create_all()
+
 """ Creating the Flask instances for a shell context. """
 @application.shell_context_processor
 def make_shell_context():
@@ -28,23 +31,15 @@ submissions_queue = []
 def check_for_submissions(user, subreddit, monitored_keywords):
     for submission in subreddit.rising():
         for monitored_keyword in monitored_keywords:
-            if monitored_keyword.keyword in submission.title and submission.title not in submissions_queue:
-                # Make a POST request to the Programmable Messaging API's Message endpoint in order to create a new outbound message.
-                # Use the twilio-python library's create() method.
-                # message = client.messages \
-                #     .create(
-                #         body=submission.url,
-                #         from_='+' + user.phone_num,
-                #         to='+16263716944'
-                #     )    
-                ##############
+            submissionTitleSplit = submission.title.split()
+            if monitored_keyword.keyword in submissionTitleSplit and submission.title not in submissions_queue:
                 message = client.messages \
                     .create(
                         body=submission.url,
                         from_='+14256573687',
                         to='+1' + user.phone_num
-                    )   
-                print('printing in place of texting.')
+                    )  
+                # print('printing in place of texting.')
                 submissions_queue.append(submission.title)
 
 # Read all users in the database, and all of their subreddits and keywords.
@@ -68,3 +63,20 @@ scheduler.add_job(clear_submissions_queue, 'interval', days=1)
 
 """ Start the scheduler """
 scheduler.start()
+
+
+                # print('title: ', submission.title) 
+                # print('keyword: ', monitored_keyword.keyword)
+                # index = submission.title.index(monitored_keyword.keyword)
+                # print('index: ', submission.title.index(monitored_keyword.keyword))
+                # print('element at index: ', submission.title[index])
+                # print('----------------------------------------')
+                # Make a POST request to the Programmable Messaging API's Message endpoint in order to create a new outbound message.
+                # Use the twilio-python library's create() method.
+                # message = client.messages \
+                #     .create(
+                #         body=submission.url,
+                #         from_='+' + user.phone_num,
+                #         to='+16263716944'
+                #     )    
+                ##############

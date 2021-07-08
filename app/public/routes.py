@@ -1,7 +1,7 @@
 """
 The routes module for the Flask application.
 """
-from flask import request, jsonify
+from flask import request, jsonify, Response
 from app.extensions import db
 from app.application import application
 from app.models import User, Subreddit, Keyword
@@ -10,9 +10,13 @@ from sqlalchemy.exc import IntegrityError
 import re
 # from flask_cors import cross_origin
 
-@application.route('/')
 
-@application.route('/index')
+
+@application.route('/', methods=['GET'])
+def index():
+    return '<h1>This is my flask app</h1>'
+
+# @application.route('/index')
 
 @application.route('/api/login', methods=['POST'])
 # @cross_origin(supports_credentials=True)
@@ -68,6 +72,9 @@ def register():
         token=token,
         user=new_user.serialize()
     )
+
+    # return Response(status=201)
+
 
 @application.route('/api/submitSubredditInfo', methods=['POST'])
 def submitSubredditInfo():

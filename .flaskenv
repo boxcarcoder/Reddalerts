@@ -1,1 +1,1 @@
-FLASK_APP=script.py
+FLASK_APP=reddalerts.py

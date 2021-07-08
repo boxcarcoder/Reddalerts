@@ -3,7 +3,6 @@ config.py
 /venv
 .vscode/
 .DS_Store
-app.db
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
