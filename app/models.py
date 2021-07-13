@@ -4,6 +4,10 @@ Models for the SQL database.
 from app.extensions import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.inspection import inspect
+# from sqlalchemy_utils import auto_delete_orphans
+# for deleting many-to-many "orphans".
+# from sqlalchemy import event, create_engine
+# from sqlalchemy.orm import attributes, sessionmaker
 
 class JsonSerializer(object):
     def serialize(self):
@@ -23,11 +27,18 @@ An association table between the users and subreddits tables to create
 a many-to-many relationship.
 """
 users_subreddits = db.Table('users_subreddits',
-    db.Column('id', db.Integer, primary_key=True),
     # Place the users and subreddits foreign key into the table.
-    db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
-    db.Column('subreddit_id', db.Integer, db.ForeignKey('subreddits.id'))
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id', ondelete='CASCADE')),
+    db.Column('subreddit_id', db.Integer, db.ForeignKey('subreddits.id',  ondelete='CASCADE'))
 )
+
+# old structure that may include fluff?
+# users_subreddits = db.Table('users_subreddits',
+#     db.Column('id', db.Integer, primary_key=True),
+#     # Place the users and subreddits foreign key into the table.
+#     db.Column('user_id', db.Integer, db.ForeignKey('users.id', ondelete='CASCADE')),
+#     db.Column('subreddit_id', db.Integer, db.ForeignKey('subreddits.id',  ondelete='CASCADE'))
+# )
 
 class User(db.Model, JsonSerializer):
     """
@@ -41,9 +52,10 @@ class User(db.Model, JsonSerializer):
     email = db.Column(db.String(128), index=True, unique=True)
     password_hash = db.Column(db.String(128))
     phone_num = db.Column(db.String(64), index=True, unique=True)
-    # Establish a parent-children relationship (user -> subreddits).
-    # Add an association table with the relationship.secondary argument.
-    subreddits = db.relationship('Subreddit', secondary=users_subreddits, backref='users', lazy='dynamic')
+    received_posts = db.Column(db.String(128), index=True, unique=True)
+
+    # Establish a "parent-children" relationship (user -> subreddits).
+    subreddits = db.relationship('Subreddit', secondary=users_subreddits, backref='users', cascade='all, delete', lazy='dynamic')
 
     """
     Helper Functions.
@@ -73,11 +85,9 @@ An association table between the subreddits and keywords tables to create
 a many-to-many relationship.
 """
 subreddits_keywords = db.Table('subreddits_keywords', db.Model.metadata,
-    db.Column('id', db.Integer, primary_key=True),
     # Place the subreddits and keywords foreign keys in the table.
-    db.Column('subreddit_id', db.Integer, db.ForeignKey('subreddits.id')),
-    db.Column('keyword_id', db.Integer, db.ForeignKey('keywords.id')),
-    db.UniqueConstraint('subreddit_id', 'keyword_id', name='UC_subreddit_id_keyword_id'),
+    db.Column('subreddit_id', db.Integer, db.ForeignKey('subreddits.id', ondelete='CASCADE')),
+    db.Column('keyword_id', db.Integer, db.ForeignKey('keywords.id',  ondelete='CASCADE')),
 )
 
 class Subreddit(db.Model, JsonSerializer):
@@ -90,8 +100,8 @@ class Subreddit(db.Model, JsonSerializer):
     id = db.Column(db.Integer, primary_key=True)
     subreddit_name = db.Column(db.String(128), index=True)
 
-    # Establish a parent-children relationship (subreddit -> keywords).
-    keywords = db.relationship('Keyword', secondary=subreddits_keywords, backref='subreddits', lazy='dynamic')
+    # Establish a "parent-children" relationship (subreddit -> keywords).
+    keywords = db.relationship('Keyword', secondary=subreddits_keywords, backref='subreddits', cascade='all, delete', lazy='dynamic')
 
     """ Constructor """
     def __init__(self, subreddit_name):
@@ -144,3 +154,45 @@ class Keyword(db.Model, JsonSerializer):
         del dictionary["subreddits"]
         return dictionary
 
+
+
+# migrate to routes?
+# test without self parameter.
+def check_for_keyword_orphans(self, keyword):
+    # check if each keyword has an associated subreddit
+    if len(keyword.subreddits) == 0:
+        self.session.delete(keyword)
+        return True # keyword deleted
+    else:
+        return False # keyword still has associated subreddit
+
+
+# engine = create_engine("mysql://", echo=True)
+# Session = sessionmaker(bind=engine)
+
+# @event.listens_for(Session, 'after_flush')
+# def delete_tag_orphans(session, ctx):
+#     # optional: look through Session state to see if we want
+#     # to emit a DELETE for orphan Tags
+#     flag = False
+
+#     for instance in session.dirty:
+#         if isinstance(instance, Subreddit) and \
+#             attributes.get_history(instance, 'keywords').deleted:
+#             flag = True
+#             break
+#     for instance in session.deleted:
+#         if isinstance(instance, Subreddit):
+#             flag = True
+#             break
+
+#     # emit a DELETE for all orphan Tags.   This is safe to emit
+#     # regardless of "flag", if a less verbose approach is
+#     # desired.
+#     if flag:
+#         session.query(Keyword).\
+#             filter(~Keyword.subreddits.any()).\
+#             delete(synchronize_session=False)
+
+
+# auto_delete_orphans(Subreddit.keywords)

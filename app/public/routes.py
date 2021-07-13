@@ -8,9 +8,6 @@ from app.models import User, Subreddit, Keyword
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from sqlalchemy.exc import IntegrityError
 import re
-# from flask_cors import cross_origin
-
-
 
 @application.route('/', methods=['GET'])
 def index():
@@ -114,6 +111,7 @@ def submitSubredditInfo():
 
         # Create and add keyword instances to the subreddit instance
         subreddit_keywords = subreddit_keywords.split(',')
+        # Remove spaces too ***
         for kw in subreddit_keywords:
             keyword = Keyword(kw)
             subreddit.keywords.append(keyword)
@@ -147,14 +145,44 @@ def deleteMonitoredSubreddit():
     logged_in_user_id = request.args.get('id')
     subreddit_name = request.args.get('subredditName')
 
-    # Remove the subreddit from the user
+    # Fetch the current user
     user = User.query.get(logged_in_user_id) 
     if user == None:
         return jsonify(message='User is not authorized.'), 401
 
-    subreddit = user.subreddits.filter_by(subreddit_name=subreddit_name).one()
-    user.subreddits.remove(subreddit)
+    # Fetch the subreddit to be deleted.
+    subreddit = Subreddit.query.filter_by(subreddit_name=subreddit_name).one()
+
+    # Delete the monitored subreddit only if it no longer has an associated user.
+    # How can I delete the subreddit since it is associated with the logged in user?
+    # Remove the current user from the subreddit's list of users.
+    subreddits_without_curr_user = []
+    for subreddit_user in subreddit.users:
+        if (subreddit_user != user):
+            subreddits_without_curr_user.append(subreddit_user)
+    subreddit.users = subreddits_without_curr_user
+   
+    # Now that the subreddit is not associated with the logged in user, we can delete it if it is orphaned.
+    check_for_subreddit_orphans(subreddit)
+
+    # Delete the monitored subreddit's keywords if the keywords no longer have an associated subreddit.
+    # Now that the subreddit is deleted (after disassociating with the logged in user), we can delete keywords if they're orphaned.
+    keywords = subreddit.keywords
+    for keyword in keywords:
+        check_for_keyword_orphans(keyword)
+
     db.session.commit()
+
+
+
+    # I want to delete the monitored subreddit associated with a user.
+    # # Delete the subreddit from the user
+    # user = User.query.get(logged_in_user_id) 
+    # if user == None:
+    #     return jsonify(message='User is not authorized.'), 401
+
+    # subreddit = user.subreddits.filter_by(subreddit_name=subreddit_name).one()
+    # user.subreddits.delete(subreddit)
 
     # Return the new list of subreddits
     return jsonify(subreddits = Subreddit.serialize_list(user.subreddits))
@@ -187,11 +215,29 @@ def deletePhoneNumber():
     if user == None:
         return jsonify(message='User is not authorized.'), 401
 
-    user.phone_num = None
+    user.phone_num = None # doesn't require .delete() since it's not a record, but a field within the record. A record is a whole row of a table.
 
     db.session.commit()
 
     return jsonify(user.serialize())
 
+def check_for_subreddit_orphans(subreddit):
+    # check if each keyword has an associated user
+    if len(subreddit.users) == 0:
+        db.session.delete(subreddit)
+        print('1')
+        return True # subreddit deleted since it has no associated user
+    else:
+        print('2')
+        return False # subreddit has an associated user
 
 
+def check_for_keyword_orphans(keyword):
+    # check if each keyword has an associated subreddit
+    if len(keyword.subreddits) == 0:
+        db.session.delete(keyword)
+        print('3')
+        return True # keyword deleted
+    else:
+        print('4')
+        return False # keyword has an associated subreddit

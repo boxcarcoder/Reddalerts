@@ -27,20 +27,19 @@ client = Client(Config.TWILIO_ACCOUNT_SID, Config.TWILIO_AUTH_TOKEN)
 
 """ Periodically check for rising subreddits. """
 # Check the retrieved subreddit's rising posts for any monitored keywords.
-submissions_queue = []
 def check_for_submissions(user, subreddit, monitored_keywords):
     for submission in subreddit.rising():
         for monitored_keyword in monitored_keywords:
             submissionTitleSplit = submission.title.split()
-            if monitored_keyword.keyword in submissionTitleSplit and submission.title not in submissions_queue:
+            if monitored_keyword.keyword in submissionTitleSplit and User.filter_by(received_posts=submission.title).one() is None:
                 message = client.messages \
                     .create(
                         body=submission.url,
                         from_='+14256573687',
                         to='+1' + user.phone_num
                     )  
-                # print('printing in place of texting.')
-                submissions_queue.append(submission.title)
+                user.received_posts.append(submission.title)                                                        #see if append() uses relation magic or not
+                db.session.commit()       
 
 # Read all users in the database, and all of their subreddits and keywords.
 def read_database():
@@ -55,9 +54,12 @@ def read_database():
 
 scheduler.add_job(read_database, 'interval', minutes=1)
 
-""" Clear submissions queue after a day """
+""" Clear each user's queue (that stores what posts they've received already) after a day. """
 def clear_submissions_queue():
-    del submissions_queue[:]
+    users = User.query.all()
+    for user in users:
+        user.received_posts = []    #*** i believe i can just set .received_posts to empty, as opposed to using .delete() since i am not deleting an entire row.
+    db.session.commit()             #***
 scheduler.add_job(clear_submissions_queue, 'interval', days=1)
 
 
