@@ -95,8 +95,13 @@ def submitSubredditInfo():
                 # Create and add keyword instances to the subreddit instance
                 subreddit_keywords = subreddit_keywords.split(',')
                 for kw in subreddit_keywords:
-                    keyword = Keyword(kw)
-                    subreddit.keywords.append(keyword)
+                    # check if Keyword objects are in the database already
+                    if Keyword.query.filter_by(keyword=kw).first() is not None:
+                        keyword = Keyword.query.filter_by(keyword=kw).first()
+                        subreddit.keywords.append(keyword) 
+                    else: # create new Keyword objects
+                        keyword = Keyword(kw)
+                        subreddit.keywords.append(keyword)
 
                 db.session.commit()       
 
@@ -109,12 +114,16 @@ def submitSubredditInfo():
     else:
         subreddit = Subreddit(subreddit_name)
 
-        # Create and add keyword instances to the subreddit instance
+        # Create and add keyword instances to the subreddit instance. Remove spaces too ***
         subreddit_keywords = subreddit_keywords.split(',')
-        # Remove spaces too ***
         for kw in subreddit_keywords:
-            keyword = Keyword(kw)
-            subreddit.keywords.append(keyword)
+            # check if Keyword objects are in the database already
+            if Keyword.query.filter_by(keyword=kw).first() is not None:
+                keyword = Keyword.query.filter_by(keyword=kw).first()
+                subreddit.keywords.append(keyword) #kw is a string, while keyword is a Keyword object. subreddit.keywords expects Keyword objects.
+            else: # create new Keyword objects
+                keyword = Keyword(kw)
+                subreddit.keywords.append(keyword)
 
         user.subreddits.append(subreddit)
 
@@ -155,7 +164,7 @@ def deleteMonitoredSubreddit():
 
     # Delete the monitored subreddit only if it no longer has an associated user.
     # How can I delete the subreddit since it is associated with the logged in user?
-    # Remove the current user from the subreddit's list of users.
+    # Remove the current user from the subreddit's list of users. I don't need to delete() the user, just remove the association.
     subreddits_without_curr_user = []
     for subreddit_user in subreddit.users:
         if (subreddit_user != user):
@@ -169,20 +178,10 @@ def deleteMonitoredSubreddit():
     # Now that the subreddit is deleted (after disassociating with the logged in user), we can delete keywords if they're orphaned.
     keywords = subreddit.keywords
     for keyword in keywords:
+        print('5')
         check_for_keyword_orphans(keyword)
-
+        print('6')
     db.session.commit()
-
-
-
-    # I want to delete the monitored subreddit associated with a user.
-    # # Delete the subreddit from the user
-    # user = User.query.get(logged_in_user_id) 
-    # if user == None:
-    #     return jsonify(message='User is not authorized.'), 401
-
-    # subreddit = user.subreddits.filter_by(subreddit_name=subreddit_name).one()
-    # user.subreddits.delete(subreddit)
 
     # Return the new list of subreddits
     return jsonify(subreddits = Subreddit.serialize_list(user.subreddits))
