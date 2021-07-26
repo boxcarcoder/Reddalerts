@@ -4,7 +4,7 @@ The routes module for the Flask application.
 from flask import request, jsonify, Response
 from app.extensions import db
 from app.application import application
-from app.models import User, Subreddit, Keyword, Monitoring
+from app.models import User, Subreddit, Keyword, Monitor
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from sqlalchemy.exc import IntegrityError
 import re
@@ -53,9 +53,10 @@ def register():
     user = User(username, email, password)
     db.session.add(user)
 
-    # Begin monitoring the user and their subreddits and keywords.
-    monitoring = Monitoring(user=user, subreddit=None, keyword=None)
-    db.session.add(monitoring)
+    # # Begin monitoring the user and their subreddits and keywords for the fetchSubreddits upon register/login.
+    # monitor = monitor(user=user, subreddit=None, keyword=None)
+    # db.session.add(monitor)
+
     try:
         db.session.commit()
     except IntegrityError:
@@ -86,55 +87,20 @@ def submitSubredditInfo():
     if user == None:
         return jsonify(message='User is not authorized.'), 401
 
-    # Check if the user is monitoring this subreddit already. If they are, update the monitoring instance with the keywords.
+    # Fetch the subreddit from the database for the user+subreddit monitor check.
+    subreddit = Subreddit.query.filter_by(subreddit_name=subreddit_name).first()
 
-    # Fetch the user's monitoring status
-    monitoring = Monitoring.query.filter(Monitoring.user.has(id=logged_in_user_id)).first()
-    # print('==============')
-    # print('monitoring in submitSubredditInfo: ', monitoring)
-    # print('==============')
-    
-    # if Monitoring.query.filter_by(user=user, subreddit=subreddit_name).first() is not None:
-    if monitoring.subreddit is not None:
-        
-        monitoring = Monitoring.query.filter_by(user=user, subreddit=subreddit_name).first()
-        
-        # Add keyword instances to the monitoring instance. Remove spaces too ***
-        subreddit_keywords = subreddit_keywords.split(',')
-        for kw in subreddit_keywords:
-            # check if Keyword objects are in the database already
-            if Keyword.query.filter_by(keyword=kw).first() is not None:
-                keyword = Keyword.query.filter_by(keyword=kw).first()
-            else: # create new Keyword objects
-                keyword = Keyword(kw)            
-            monitoring.keywords.append(keyword)
+    # Check if the user is monitoring the subreddit. Use join() to query multiple tables 
+    # at the same time.
+    if Monitor.query.join(Monitor.user, Monitor.subreddit)\
+        .filter(Monitor.user==user)\
+        .filter(Monitor.subreddit==subreddit).first() is None:
+        print('User is not monitoring this subreddit yet.')
 
-        db.session.commit()       
-
-        return jsonify(
-            subreddit=Monitoring.query.filter_by(users=user, subreddits=subreddit_name).serialize(),
-            update='true'
-        )    
-
-    # If they aren't monitoring the subreddit yet, create a new subreddit instance and a new monitoring instance.
-    else:
         subreddit = Subreddit(subreddit_name)
-        
-        # # Create a monitoring object which contains the unique relationship between User, Subreddit, and Keyword
-        # monitoring = Monitoring(users=user, subreddits=subreddit)
-        # # monitoring = Monitoring(users=user, subreddits=subreddit, keywords=subreddit_keywords[0])
 
-        # Add the subreddit instance to the current logged in user's monitoring object.
-        # monitoring = Monitoring.query.filter(Monitoring.users.has(id=logged_in_user_id)).first()
-
-        monitoring = Monitoring.query.join(Monitoring.user, aliased=True).filter_by(id=logged_in_user_id).first()
-        print('==============')
-        print('monitoring in submitSubredditInfo: ', monitoring)
-        print('==============')
-        monitoring.subreddit = subreddit
-        # monitoring.subreddit.append(subreddit)
-
-        # Add keyword instances to the monitoring instance. Remove spaces too ***
+        # WRONG: Add keyword instances to the monitor instance. Remove spaces too ***
+        # RIGHT?: Create a monitor instance for each keyword.
         subreddit_keywords = subreddit_keywords.split(',')
         for kw in subreddit_keywords:
             # check if Keyword objects are in the database already
@@ -142,21 +108,18 @@ def submitSubredditInfo():
                 keyword = Keyword.query.filter_by(keyword=kw).first()
             else: # create new Keyword objects
                 keyword = Keyword(kw)
-            
-            if (monitoring.keyword is None):
-                print('FUCK')
-                monitoring.keyword = keyword
-            else:
-                print('YOU')
-                monitoring.keyword.extend(keyword)
 
-        # db.session.add(monitoring)
+            # Create a monitor object for the current user, subreddit, and keyword.
+            monitor = Monitor(user=user, subreddit=subreddit, keyword=keyword)
+            db.session.add(monitor)
+
         db.session.commit()
 
         return jsonify(
-            subreddit=subreddit.serialize(),
+            subreddit=subreddit.serialize(), #this no longer sends keywords with subreddit during subreddit serialization.
+                                            # need to send keywords back to the frontend. need to change how the redux action and reducer expects keywords
             update='false'
-        )    
+        )   
 
 @application.route('/api/fetchSubredditsInfo', methods=['GET'])
 def fetchSubredditsInfo():
@@ -166,15 +129,17 @@ def fetchSubredditsInfo():
     if user == None:
         return jsonify(message='User is not authorized.'), 401
 
-    # Fetch the logged in user's subreddits
-    monitoring = Monitoring.query.join(Monitoring.user, aliased=True).filter_by(id=logged_in_user_id).first()
-    subreddits = monitoring.subreddit
-
-    # Serialize and send the user's subreddits to the client.
-    if subreddits is not None:
-        subreddits_serialized = Subreddit.serialize_list(subreddits)
-    else:
+    # Check if the user is monitoring any subreddits and keywords yet. Use join() to query a self-referential structure.
+    # Have to check if monitor.user even exists yet before we can perform a check on it.
+    curr_user_monitors = Monitor.query.join(Monitor.user).filter(Monitor.user==user).first()
+    
+    if curr_user_monitors is None:
         subreddits_serialized = []
+    else: # the user is monitoring subreddit(s).
+        subreddits = Subreddit.query.join(Subreddit.monitors).filter(Monitor.user==user).all()
+        # subreddits = curr_user_monitors.subreddit # might not work. will test later.
+        subreddits_serialized = Subreddit.serialize_list(subreddits) # might not work. will test later.
+
     return jsonify(subreddits=subreddits_serialized)
 
 @application.route('/api/deleteMonitoredSubreddit', methods=['DELETE'])
@@ -260,6 +225,99 @@ def check_for_subreddit_orphans(subreddit):
         return False # subreddit has an associated user
 
 
+
+
+
+
+
+
+
+# @application.route('/api/submitSubredditInfo', methods=['POST'])
+# def submitSubredditInfo():
+#     # Parse the incoming data
+#     incoming = request.get_json()
+#     subreddit_name = incoming["subredditName"]
+#     subreddit_keywords = incoming["subredditKeywords"]
+#     logged_in_user_id = incoming["id"]
+
+#     # Query the user to append subreddits and keywords to it.  
+#     user = User.query.get(logged_in_user_id)
+#     if user == None:
+#         return jsonify(message='User is not authorized.'), 401
+
+#     # Check if the user is monitor any subreddits yet.
+#     if (user.monitor is None):
+        
+
+
+
+
+    
+#     # Begin monitor the user and their subreddits and keywords.
+#     monitor = monitor(user=user, subreddit=None, keyword=None)
+#     db.session.add(monitor)
+
+#     # Check if the user is monitor this subreddit already. If they are, update the monitor instance with the keywords.    
+#     # if monitor.query.filter_by(user=user, subreddit=subreddit_name).first() is not None:
+#     if monitor.subreddit is not None:
+        
+#         monitor = monitor.query.filter_by(user=user, subreddit=subreddit_name).first()
+        
+#         # Add keyword instances to the monitor instance. Remove spaces too ***
+#         subreddit_keywords = subreddit_keywords.split(',')
+#         for kw in subreddit_keywords:
+#             # check if Keyword objects are in the database already
+#             if Keyword.query.filter_by(keyword=kw).first() is not None:
+#                 keyword = Keyword.query.filter_by(keyword=kw).first()
+#             else: # create new Keyword objects
+#                 keyword = Keyword(kw)            
+#             keyword.append(monitor)
+
+#         db.session.commit()       
+
+#         return jsonify(
+#             subreddit=monitor.query.filter_by(users=user, subreddits=subreddit_name).serialize(),
+#             update='true'
+#         )    
+
+#     # If they aren't monitor the subreddit yet, create a new subreddit instance and 
+#     # add it to the logged in user's monitor instance.
+#     else:
+#         subreddit = Subreddit(subreddit_name)
+
+#         # Add the subreddit instance to the current logged in user's monitor object.
+#         monitor.subreddit = subreddit
+
+#         # Add keyword instances to the monitor instance. Remove spaces too ***
+#         subreddit_keywords = subreddit_keywords.split(',')
+#         monitor_keywords = []
+#         for kw in subreddit_keywords:
+#             # check if Keyword objects are in the database already
+#             if Keyword.query.filter_by(keyword=kw).first() is not None:
+#                 keyword = Keyword.query.filter_by(keyword=kw).first()
+#             else: # create new Keyword objects
+#                 keyword = Keyword(kw)
+
+#             if (monitor.keyword is None):
+#                 monitor.keyword = keyword
+#             else:
+#                 monitor.keyword.append(keyword)      
+#                 # keyword.append(monitor)
+#                 # keyword.append(monitor)
+#                 # monitor.append(keyword)
+#                 # monitor.keyword.append(keyword)
+#                 # user.monitor.append(keyword)
+    
+#         # db.session.add(monitor)
+#         db.session.commit()
+
+#         return jsonify(
+#             subreddit=subreddit.serialize(),
+#             update='false'
+#         )    
+
+
+
 # def check_for_keyword_orphans(keyword):
 #     # check if each keyword has an associated subreddit
 #     if len(keyword.subreddits) == 0:
@@ -296,3 +354,23 @@ def check_for_subreddit_orphans(subreddit):
                 #     subreddit=subreddit.serialize(),
                 #     update='true'
                 # )    
+
+
+
+
+    # Testing how to query monitor for a certain user and subreddit:
+    # subreddit = Subreddit('stocks')
+    # keyword = Keyword('keyword')
+    # monitor = monitor(user=user, subreddit=subreddit, keyword=keyword)
+
+    # test = monitor.query.join(monitor.user, monitor.subreddit)\
+    #     .filter(monitor.user==user)\
+    #     .filter(monitor.subreddit==subreddit).all()
+    # print('================================')
+    # print('test: ', test[0])
+    # print('test.user: ', test[0].user)
+    # print('test.subreddit: ', test[0].subreddit)
+    # print('test.keyword: ', test[0].keyword)
+
+
+        # curr_user_monitors = Monitor.query.join(Monitor.user, aliased=True).filter_by(id=logged_in_user_id).first()

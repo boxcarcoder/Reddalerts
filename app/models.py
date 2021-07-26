@@ -29,7 +29,7 @@ class User(db.Model, JsonSerializer):
     phone_num = db.Column(db.String(64), index=True, unique=True)
     received_posts = db.Column(db.String(128), index=True, unique=True)
 
-    monitoring = db.relationship('Monitoring', back_populates='user')
+    # monitor = db.relationship('Monitor', back_populates='user')
 
     """
     Helper Functions.
@@ -48,10 +48,10 @@ class User(db.Model, JsonSerializer):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-    # Overload serializer to delete Monitoring column from a user object during serialization.
+    # Overload serializer to delete Monitor column from a user object during serialization.
     def serialize(self):
         dictionary = JsonSerializer.serialize(self)
-        del dictionary["monitoring"]
+        del dictionary["monitors"] 
         return dictionary
 
 
@@ -75,6 +75,7 @@ class Subreddit(db.Model, JsonSerializer):
 
     def serialize(self):
         dictionary = JsonSerializer.serialize(self)
+        del dictionary["monitors"]
         return dictionary
 
 
@@ -84,7 +85,7 @@ class Keyword(db.Model, JsonSerializer):
     id = db.Column(db.Integer, primary_key=True)
     keyword = db.Column(db.String(128), index=True)
 
-    monitoring = db.relationship('Monitoring', back_populates='keyword')
+    # monitor = db.relationship('Monitor', back_populates='keyword')
 
     """
     Helper Functions.
@@ -103,21 +104,33 @@ class Keyword(db.Model, JsonSerializer):
         return dictionary
 
 
-class Monitoring(db.Model):
-    __table_name__ = 'monitorings'
+class Monitor(db.Model):
+    __table_name__ = 'monitors'
 
     id = db.Column(db.Integer, primary_key=True)
-    users_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
-    subreddits_id = db.Column(db.Integer, db.ForeignKey("subreddits.id"), nullable=True)
-    keywords_id = db.Column(db.Integer, db.ForeignKey("keywords.id"), nullable=True)
 
-    user = db.relationship('User', back_populates='monitoring')
-    subreddit = db.relationship('Subreddit')
-    keyword = db.relationship('Keyword', back_populates='monitoring')
+    # Enable relationship between monitor <-> user.
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
+    # Establish a collection of User objects on Monitor. (Monitor.user)
+    user = db.relationship('User', backref='monitors')
 
-    # users = db.relationship('User', backref='monitoring')
-    # subreddits = db.relationship('Subreddit')
-    # keywords = db.relationship('Keyword', backref='monitoring')
+    # Enable relationship monitor <-> subreddit.
+    subreddit_id = db.Column(db.Integer, db.ForeignKey("subreddits.id"), nullable=True)
+    # Establish a collection of Subreddit objects on Monitor.
+    subreddit = db.relationship('Subreddit', backref='monitors')
+
+    # Enable relationship between monitor <-> keyword.    
+    keyword_id = db.Column(db.Integer, db.ForeignKey("keywords.id"), nullable=True)
+    # Establish a collection of Keyword objects on Monitor.
+    keyword = db.relationship('Keyword', backref='monitors')
+
+    # user = db.relationship('User', back_populates='monitor')
+    # subreddit = db.relationship('Subreddit')
+    # keyword = db.relationship('Keyword', back_populates='monitor')
+
+    def __repr__(self):
+        return "<Monitor(%s)>".format(self)
+
 
 
 
