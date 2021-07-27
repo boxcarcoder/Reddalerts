@@ -18,7 +18,6 @@ class JsonSerializer(object):
     def serialize_list(l):
         return [entry.serialize() for entry in l]
 
-
 class User(db.Model, JsonSerializer):
     __tablename__ = 'users'
 
@@ -101,10 +100,11 @@ class Keyword(db.Model, JsonSerializer):
 
     def serialize(self):
         dictionary = JsonSerializer.serialize(self)
+        del dictionary["monitors"]
         return dictionary
 
 
-class Monitor(db.Model):
+class Monitor(db.Model, JsonSerializer):
     __table_name__ = 'monitors'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -130,6 +130,13 @@ class Monitor(db.Model):
 
     def __repr__(self):
         return "<Monitor(%s)>".format(self)
+
+    def serialize(self):
+        dictionary = JsonSerializer.serialize(self)
+        dictionary["user"] = dictionary["user"].serialize()
+        dictionary["subreddit"] = dictionary["subreddit"].serialize()
+        dictionary["keyword"] = dictionary["keyword"].serialize()
+        return dictionary
 
 
 

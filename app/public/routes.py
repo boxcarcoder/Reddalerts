@@ -115,11 +115,30 @@ def submitSubredditInfo():
 
         db.session.commit()
 
+        # Fetch all keywords that are monitored by the logged in user and the submitted subreddit.
+        keywords = Keyword.query.join(Keyword.monitors).filter(Monitor.user==user, Monitor.subreddit==subreddit).all()
+
+        print('keywords: ', keywords)
+
+        monitors = Monitor.query.join(Monitor.user, Monitor.subreddit).filter(Monitor.user==user, Monitor.subreddit==subreddit).all()
+        print('monitor: ', monitors)
+
+
+        monitors_serialized = Monitor.serialize_list(monitors)
+        print('monitor.serialize_list(): ', monitors_serialized)
+
         return jsonify(
-            subreddit=subreddit.serialize(), #this no longer sends keywords with subreddit during subreddit serialization.
-                                            # need to send keywords back to the frontend. need to change how the redux action and reducer expects keywords
+            monitors=monitors_serialized,
             update='false'
-        )   
+        )
+
+        # return jsonify(
+        #     subreddit=subreddit.serialize(), 
+        #     keywords=Keyword.query.join(Keyword.monitors).filter(Monitor.user==user, Monitor.subreddit==subreddit).all().serialize_all(),
+        #     update='false'
+        # )   
+
+    # If the user is monitoring the subreddit already, update the subreddits.
 
 @application.route('/api/fetchSubredditsInfo', methods=['GET'])
 def fetchSubredditsInfo():
@@ -130,7 +149,6 @@ def fetchSubredditsInfo():
         return jsonify(message='User is not authorized.'), 401
 
     # Check if the user is monitoring any subreddits and keywords yet. Use join() to query a self-referential structure.
-    # Have to check if monitor.user even exists yet before we can perform a check on it.
     curr_user_monitors = Monitor.query.join(Monitor.user).filter(Monitor.user==user).first()
     
     if curr_user_monitors is None:
