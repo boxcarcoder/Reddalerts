@@ -123,10 +123,10 @@ def submitSubredditInfo():
 
         # Or send all monitor objects related to the current user and subreddit?
         monitors = Monitor.query.join(Monitor.user, Monitor.subreddit).filter(Monitor.user==user, Monitor.subreddit==subreddit).all()
-        print('monitor: ', monitors)
+        # print('monitor: ', monitors)
 
         monitors_serialized = Monitor.serialize_list(monitors)
-        print('monitors.serialize_list(): ', monitors_serialized)
+        # print('monitors.serialize_list(): ', monitors_serialized)
 
         return jsonify(
             monitors=monitors_serialized,
@@ -139,7 +139,7 @@ def submitSubredditInfo():
         #     update='false'
         # )   
 
-    # If the user is monitoring the subreddit already, update the subreddits.
+    # Else if the user is monitoring the subreddit already, update the subreddits.
 
 @application.route('/api/fetchSubredditsInfo', methods=['GET'])
 def fetchSubredditsInfo():
@@ -176,26 +176,40 @@ def deleteMonitoredSubreddit():
     if user == None:
         return jsonify(message='User is not authorized.'), 401
 
-    # Fetch the subreddit to be deleted.
-    subreddit = Subreddit.query.filter_by(subreddit_name=subreddit_name).one()
+    # Fetch the Monitor instances that correspond to the logged in user and designated subreddit.
+    subreddit = Subreddit.query.filter(Subreddit.subreddit_name==subreddit_name).first()
+    monitors = Monitor.query.join(Monitor.user, Monitor.subreddit).filter(Monitor.user==user, Monitor.subreddit==subreddit).all()
 
-    # Delete the monitored subreddit only if it no longer has an associated user.
-    # How can I delete the subreddit since it is associated with the logged in user?
-    # Remove the current user from the subreddit's list of users. I don't need to delete() the user, just remove the association.
-    subreddits_without_curr_user = []
-    for subreddit_user in subreddit.users:
-        if (subreddit_user != user):
-            subreddits_without_curr_user.append(subreddit_user)
-    subreddit.users = subreddits_without_curr_user
+    for monitor in monitors:
+        print('1')
+        db.session.delete(monitor)
+        db.session.commit()
+
+    # Return the new list of monitors that corrrespond to the logged in user and their subreddits (that now no longer have the deleted subreddit).
+    new_monitors = Monitor.query.join(Monitor.user).filter(Monitor.user==user).all()
+    return jsonify(monitors = Monitor.serialize_list(new_monitors))
+
+    # # Fetch the subreddit to be deleted.
+    # subreddit = Subreddit.query.filter_by(subreddit_name=subreddit_name).one()
+
+    # # Delete the monitored subreddit only if it no longer has an associated user.
+    # # How can I delete the subreddit since it is associated with the logged in user?
+    # # Remove the current user from the subreddit's list of users. I don't need to delete() the user, just remove the association.
+    # subreddits_without_curr_user = []
+    # for subreddit_user in subreddit.users:
+    #     if (subreddit_user != user):
+    #         subreddits_without_curr_user.append(subreddit_user)
+    # subreddit.users = subreddits_without_curr_user
    
-    # Now that the subreddit is not associated with the logged in user, we can delete it if it is orphaned.
-    check_for_subreddit_orphans(subreddit)
+    # # Now that the subreddit is not associated with the logged in user, we can delete it if it is orphaned.
+    # check_for_subreddit_orphans(subreddit)
+
+    # db.session.commit()
+
+    # # Return the new list of subreddits that now excludes the deleted subreddit.
+    # return jsonify(subreddits = Subreddit.serialize_list(user.subreddits))
 
 
-    db.session.commit()
-
-    # Return the new list of subreddits
-    return jsonify(subreddits = Subreddit.serialize_list(user.subreddits))
 
 @application.route('/api/submitPhoneNumber', methods=['POST'])
 def submitPhoneNumber():
@@ -235,10 +249,8 @@ def check_for_subreddit_orphans(subreddit):
     # check if each keyword has an associated user
     if len(subreddit.users) == 0:
         db.session.delete(subreddit)
-        print('1')
         return True # subreddit deleted since it has no associated user
     else:
-        print('2')
         return False # subreddit has an associated user
 
 
