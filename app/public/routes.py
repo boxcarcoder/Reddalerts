@@ -115,17 +115,18 @@ def submitSubredditInfo():
 
         db.session.commit()
 
-        # Fetch all keywords that are monitored by the logged in user and the submitted subreddit.
-        keywords = Keyword.query.join(Keyword.monitors).filter(Monitor.user==user, Monitor.subreddit==subreddit).all()
+        # # Send all keywords separately with subreddit?
+        # # Fetch all keywords that are monitored by the logged in user and the submitted subreddit.
+        # keywords = Keyword.query.join(Keyword.monitors).filter(Monitor.user==user, Monitor.subreddit==subreddit).all()
 
-        print('keywords: ', keywords)
+        # print('keywords: ', keywords)
 
+        # Or send all monitor objects related to the current user and subreddit?
         monitors = Monitor.query.join(Monitor.user, Monitor.subreddit).filter(Monitor.user==user, Monitor.subreddit==subreddit).all()
         print('monitor: ', monitors)
 
-
         monitors_serialized = Monitor.serialize_list(monitors)
-        print('monitor.serialize_list(): ', monitors_serialized)
+        print('monitors.serialize_list(): ', monitors_serialized)
 
         return jsonify(
             monitors=monitors_serialized,
@@ -134,7 +135,7 @@ def submitSubredditInfo():
 
         # return jsonify(
         #     subreddit=subreddit.serialize(), 
-        #     keywords=Keyword.query.join(Keyword.monitors).filter(Monitor.user==user, Monitor.subreddit==subreddit).all().serialize_all(),
+        #     keywords=Keyword.serialize_list(Keyword.query.join(Keyword.monitors).filter(Monitor.user==user, Monitor.subreddit==subreddit).all()),
         #     update='false'
         # )   
 
@@ -152,13 +153,17 @@ def fetchSubredditsInfo():
     curr_user_monitors = Monitor.query.join(Monitor.user).filter(Monitor.user==user).first()
     
     if curr_user_monitors is None:
-        subreddits_serialized = []
+        monitors = []
     else: # the user is monitoring subreddit(s).
-        subreddits = Subreddit.query.join(Subreddit.monitors).filter(Monitor.user==user).all()
-        # subreddits = curr_user_monitors.subreddit # might not work. will test later.
-        subreddits_serialized = Subreddit.serialize_list(subreddits) # might not work. will test later.
+        # # Send over Subreddit?
+        # subreddits = Subreddit.query.join(Subreddit.monitors).filter(Monitor.user==user).all()
 
-    return jsonify(subreddits=subreddits_serialized)
+        # # Or send over monitor objects corresponding to the logged in user?
+        monitors = Monitor.query.join(Monitor.user).filter(Monitor.user==user).all()
+
+        monitors_serialized = Monitor.serialize_list(monitors)
+
+    return jsonify(monitors=monitors_serialized)
 
 @application.route('/api/deleteMonitoredSubreddit', methods=['DELETE'])
 def deleteMonitoredSubreddit():
@@ -186,13 +191,7 @@ def deleteMonitoredSubreddit():
     # Now that the subreddit is not associated with the logged in user, we can delete it if it is orphaned.
     check_for_subreddit_orphans(subreddit)
 
-    # # Delete the monitored subreddit's keywords if the keywords no longer have an associated subreddit.
-    # # Now that the subreddit is deleted (after disassociating with the logged in user), we can delete keywords if they're orphaned.
-    # keywords = subreddit.keywords
-    # for keyword in keywords:
-    #     print('5')
-    #     check_for_keyword_orphans(keyword)
-    #     print('6')
+
     db.session.commit()
 
     # Return the new list of subreddits
