@@ -92,12 +92,8 @@ def submitSubredditInfo():
 
     # Only create a new Subreddit instance if one doesn't exist in the database already.
     if Subreddit.query.filter(Subreddit.subreddit_name==subreddit_name).first() is None: 
-        print('SUBREDDIT DOESNT EXIST YET')
-        print(Subreddit.query.filter(Subreddit.subreddit_name==subreddit_name).first())
         subreddit = Subreddit(subreddit_name)
     else:
-        print('SUBREDDIT DOES EXIST')
-        print(Subreddit.query.filter(Subreddit.subreddit_name==subreddit_name).first())
         subreddit = Subreddit.query.filter(Subreddit.subreddit_name==subreddit_name).first()
 
     # Check if the user is monitoring the subreddit. Use join() to query multiple tables 
@@ -107,8 +103,7 @@ def submitSubredditInfo():
         .filter(Monitor.subreddit==subreddit).first() is None:
         print('User is not monitoring this subreddit yet.')
 
-        # WRONG: Add keyword instances to the monitor instance. Remove spaces too ***
-        # RIGHT?: Create a monitor instance for each keyword.
+        #  Create a monitor instance for each keyword. Get rid of spaces**
         subreddit_keywords = subreddit_keywords.split(',')
         for kw in subreddit_keywords:
             # check if Keyword objects are in the database already
@@ -124,7 +119,7 @@ def submitSubredditInfo():
 
         db.session.commit()
 
-        # Or send all monitor objects related to the current user and subreddit?
+        # Send all monitor objects related to the current user and subreddit?
         monitors = Monitor.query.join(Monitor.user, Monitor.subreddit).filter(Monitor.user==user, Monitor.subreddit==subreddit).all()
 
         monitors_serialized = Monitor.serialize_list(monitors)
@@ -175,7 +170,7 @@ def deleteMonitoredSubreddit():
         return jsonify(message='User is not authorized.'), 401
 
     # Fetch the Monitor instances that correspond to the logged in user and designated subreddit.
-    subreddit = Subreddit.query.filter(Subreddit.subreddit_name==subreddit_name).one()
+    subreddit = Subreddit.query.filter(Subreddit.subreddit_name==subreddit_name).first()
     monitors = Monitor.query.join(Monitor.user, Monitor.subreddit).filter(Monitor.user==user, Monitor.subreddit==subreddit).all()
 
     # Delete the monitor objects corresponding to the logged in user and designated subreddit.
@@ -184,6 +179,9 @@ def deleteMonitoredSubreddit():
         db.session.commit()
 
     # Delete the Subreddit instance if there are no more Monitor instances corresponding to it.
+    if Monitor.query.join(Monitor.subreddit).filter(Monitor.subreddit==subreddit).first() is None:
+        print('ASDKJFH')
+        db.session.delete(subreddit)
 
     # Return the new list of monitors that corrrespond to the logged in user and their subreddits (that now no longer have the deleted subreddit).
     new_monitors = Monitor.query.join(Monitor.user).filter(Monitor.user==user).all()
