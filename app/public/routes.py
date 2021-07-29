@@ -87,12 +87,10 @@ def submitSubredditInfo():
     if user == None:
         return jsonify(message='User is not authorized.'), 401
 
-    # Fetch the subreddit from the database for the user+subreddit monitor check.
-    subreddit = Subreddit.query.filter_by(subreddit_name=subreddit_name).first()
-
     # Only create a new Subreddit instance if one doesn't exist in the database already.
     if Subreddit.query.filter(Subreddit.subreddit_name==subreddit_name).first() is None: 
         subreddit = Subreddit(subreddit_name)
+        db.session.add(subreddit)
     else:
         subreddit = Subreddit.query.filter(Subreddit.subreddit_name==subreddit_name).first()
 
@@ -111,6 +109,7 @@ def submitSubredditInfo():
                 keyword = Keyword.query.filter_by(keyword=kw).first()
             else: # create new Keyword objects
                 keyword = Keyword(kw)
+                db.session.add(keyword)
 
             # Create a monitor object for the current user, subreddit, and keyword.
             monitor = Monitor(user=user, subreddit=subreddit, keyword=keyword)
@@ -131,7 +130,7 @@ def submitSubredditInfo():
 
     # Else if the user is monitoring the subreddit already, update the subreddits.
     else:
-        print('GOT YA')
+        print('Create more Monitor instances for each keyword, subreddit, and logged in user')
 
 @application.route('/api/fetchSubredditsInfo', methods=['GET'])
 def fetchSubredditsInfo():
@@ -148,10 +147,7 @@ def fetchSubredditsInfo():
         monitors = []
         monitors_serialized = []
     else: # the user is monitoring subreddit(s).
-        # # Send over Subreddit?
-        # subreddits = Subreddit.query.join(Subreddit.monitors).filter(Monitor.user==user).all()
-
-        # # Or send over monitor objects corresponding to the logged in user?
+        #Send over monitor objects corresponding to the logged in user?
         monitors = Monitor.query.join(Monitor.user).filter(Monitor.user==user).all()
 
         monitors_serialized = Monitor.serialize_list(monitors)
@@ -180,35 +176,12 @@ def deleteMonitoredSubreddit():
 
     # Delete the Subreddit instance if there are no more Monitor instances corresponding to it.
     if Monitor.query.join(Monitor.subreddit).filter(Monitor.subreddit==subreddit).first() is None:
-        print('ASDKJFH')
         db.session.delete(subreddit)
 
     # Return the new list of monitors that corrrespond to the logged in user and their subreddits (that now no longer have the deleted subreddit).
     new_monitors = Monitor.query.join(Monitor.user).filter(Monitor.user==user).all()
-    print('new monitors after delete: ', new_monitors)
+    # print('new monitors after delete: ', new_monitors)
     return jsonify(monitors = Monitor.serialize_list(new_monitors))
-
-    # # Fetch the subreddit to be deleted.
-    # subreddit = Subreddit.query.filter_by(subreddit_name=subreddit_name).one()
-
-    # # Delete the monitored subreddit only if it no longer has an associated user.
-    # # How can I delete the subreddit since it is associated with the logged in user?
-    # # Remove the current user from the subreddit's list of users. I don't need to delete() the user, just remove the association.
-    # subreddits_without_curr_user = []
-    # for subreddit_user in subreddit.users:
-    #     if (subreddit_user != user):
-    #         subreddits_without_curr_user.append(subreddit_user)
-    # subreddit.users = subreddits_without_curr_user
-   
-    # # Now that the subreddit is not associated with the logged in user, we can delete it if it is orphaned.
-    # check_for_subreddit_orphans(subreddit)
-
-    # db.session.commit()
-
-    # # Return the new list of subreddits that now excludes the deleted subreddit.
-    # return jsonify(subreddits = Subreddit.serialize_list(user.subreddits))
-
-
 
 @application.route('/api/submitPhoneNumber', methods=['POST'])
 def submitPhoneNumber():
