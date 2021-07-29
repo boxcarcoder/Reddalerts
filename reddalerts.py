@@ -64,7 +64,7 @@ scheduler.add_job(clear_submissions_queue, 'interval', days=1)
 
 
 """ Start the scheduler """
-scheduler.start()
+# scheduler.start()
 
 
                 # print('title: ', submission.title) 

@@ -90,14 +90,22 @@ def submitSubredditInfo():
     # Fetch the subreddit from the database for the user+subreddit monitor check.
     subreddit = Subreddit.query.filter_by(subreddit_name=subreddit_name).first()
 
+    # Only create a new Subreddit instance if one doesn't exist in the database already.
+    if Subreddit.query.filter(Subreddit.subreddit_name==subreddit_name).first() is None: 
+        print('SUBREDDIT DOESNT EXIST YET')
+        print(Subreddit.query.filter(Subreddit.subreddit_name==subreddit_name).first())
+        subreddit = Subreddit(subreddit_name)
+    else:
+        print('SUBREDDIT DOES EXIST')
+        print(Subreddit.query.filter(Subreddit.subreddit_name==subreddit_name).first())
+        subreddit = Subreddit.query.filter(Subreddit.subreddit_name==subreddit_name).first()
+
     # Check if the user is monitoring the subreddit. Use join() to query multiple tables 
     # at the same time.
     if Monitor.query.join(Monitor.user, Monitor.subreddit)\
         .filter(Monitor.user==user)\
         .filter(Monitor.subreddit==subreddit).first() is None:
         print('User is not monitoring this subreddit yet.')
-
-        subreddit = Subreddit(subreddit_name)
 
         # WRONG: Add keyword instances to the monitor instance. Remove spaces too ***
         # RIGHT?: Create a monitor instance for each keyword.
@@ -111,35 +119,24 @@ def submitSubredditInfo():
 
             # Create a monitor object for the current user, subreddit, and keyword.
             monitor = Monitor(user=user, subreddit=subreddit, keyword=keyword)
+            print('commiting monitor object')
             db.session.add(monitor)
 
         db.session.commit()
 
-        # # Send all keywords separately with subreddit?
-        # # Fetch all keywords that are monitored by the logged in user and the submitted subreddit.
-        # keywords = Keyword.query.join(Keyword.monitors).filter(Monitor.user==user, Monitor.subreddit==subreddit).all()
-
-        # print('keywords: ', keywords)
-
         # Or send all monitor objects related to the current user and subreddit?
         monitors = Monitor.query.join(Monitor.user, Monitor.subreddit).filter(Monitor.user==user, Monitor.subreddit==subreddit).all()
-        # print('monitor: ', monitors)
 
         monitors_serialized = Monitor.serialize_list(monitors)
-        # print('monitors.serialize_list(): ', monitors_serialized)
 
         return jsonify(
             monitors=monitors_serialized,
             update='false'
         )
 
-        # return jsonify(
-        #     subreddit=subreddit.serialize(), 
-        #     keywords=Keyword.serialize_list(Keyword.query.join(Keyword.monitors).filter(Monitor.user==user, Monitor.subreddit==subreddit).all()),
-        #     update='false'
-        # )   
-
     # Else if the user is monitoring the subreddit already, update the subreddits.
+    else:
+        print('GOT YA')
 
 @application.route('/api/fetchSubredditsInfo', methods=['GET'])
 def fetchSubredditsInfo():
@@ -154,6 +151,7 @@ def fetchSubredditsInfo():
     
     if curr_user_monitors is None:
         monitors = []
+        monitors_serialized = []
     else: # the user is monitoring subreddit(s).
         # # Send over Subreddit?
         # subreddits = Subreddit.query.join(Subreddit.monitors).filter(Monitor.user==user).all()
@@ -177,16 +175,19 @@ def deleteMonitoredSubreddit():
         return jsonify(message='User is not authorized.'), 401
 
     # Fetch the Monitor instances that correspond to the logged in user and designated subreddit.
-    subreddit = Subreddit.query.filter(Subreddit.subreddit_name==subreddit_name).first()
+    subreddit = Subreddit.query.filter(Subreddit.subreddit_name==subreddit_name).one()
     monitors = Monitor.query.join(Monitor.user, Monitor.subreddit).filter(Monitor.user==user, Monitor.subreddit==subreddit).all()
 
+    # Delete the monitor objects corresponding to the logged in user and designated subreddit.
     for monitor in monitors:
-        print('1')
         db.session.delete(monitor)
         db.session.commit()
 
+    # Delete the Subreddit instance if there are no more Monitor instances corresponding to it.
+
     # Return the new list of monitors that corrrespond to the logged in user and their subreddits (that now no longer have the deleted subreddit).
     new_monitors = Monitor.query.join(Monitor.user).filter(Monitor.user==user).all()
+    print('new monitors after delete: ', new_monitors)
     return jsonify(monitors = Monitor.serialize_list(new_monitors))
 
     # # Fetch the subreddit to be deleted.
