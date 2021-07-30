@@ -91,46 +91,60 @@ def submitSubredditInfo():
     if Subreddit.query.filter(Subreddit.subreddit_name==subreddit_name).first() is None: 
         subreddit = Subreddit(subreddit_name)
         db.session.add(subreddit)
+        update = 'false'
     else:
         subreddit = Subreddit.query.filter(Subreddit.subreddit_name==subreddit_name).first()
+        update = 'true'
+        
+    # Create a monitor instance for each keyword. Get rid of spaces**
+    subreddit_keywords = subreddit_keywords.split(',')
+    for kw in subreddit_keywords:
+        # check if Keyword objects are in the database already
+        if Keyword.query.filter_by(keyword=kw).first() is not None:
+            keyword = Keyword.query.filter_by(keyword=kw).first()
+        else: # create new Keyword objects
+            keyword = Keyword(kw)
+            db.session.add(keyword)
 
-    # Check if the user is monitoring the subreddit. Use join() to query multiple tables 
-    # at the same time.
-    if Monitor.query.join(Monitor.user, Monitor.subreddit)\
-        .filter(Monitor.user==user)\
-        .filter(Monitor.subreddit==subreddit).first() is None:
-        print('User is not monitoring this subreddit yet.')
+        # Create a monitor object for the current user, subreddit, and keyword.
+        monitor = Monitor(user=user, subreddit=subreddit, keyword=keyword)
+        print('commiting monitor object')
+        db.session.add(monitor)
 
-        #  Create a monitor instance for each keyword. Get rid of spaces**
-        subreddit_keywords = subreddit_keywords.split(',')
-        for kw in subreddit_keywords:
-            # check if Keyword objects are in the database already
-            if Keyword.query.filter_by(keyword=kw).first() is not None:
-                keyword = Keyword.query.filter_by(keyword=kw).first()
-            else: # create new Keyword objects
-                keyword = Keyword(kw)
-                db.session.add(keyword)
+    db.session.commit()
 
-            # Create a monitor object for the current user, subreddit, and keyword.
-            monitor = Monitor(user=user, subreddit=subreddit, keyword=keyword)
-            print('commiting monitor object')
-            db.session.add(monitor)
+    # Send all monitor objects related to the current user and subreddit
+    monitors = Monitor.query.join(Monitor.user, Monitor.subreddit).filter(Monitor.user==user, Monitor.subreddit==subreddit).all()
 
-        db.session.commit()
+    monitors_serialized = Monitor.serialize_list(monitors)
 
-        # Send all monitor objects related to the current user and subreddit?
-        monitors = Monitor.query.join(Monitor.user, Monitor.subreddit).filter(Monitor.user==user, Monitor.subreddit==subreddit).all()
+    return jsonify(
+        monitors=monitors_serialized,
+        update=update
+    )
+    # # Check if the user is monitoring the subreddit. Use join() to query multiple tables 
+    # # at the same time.
+    # if Monitor.query.join(Monitor.user, Monitor.subreddit)\
+    #     .filter(Monitor.user==user)\
+    #     .filter(Monitor.subreddit==subreddit).first() is None:
+    #     print('User is not monitoring this subreddit yet.')
 
-        monitors_serialized = Monitor.serialize_list(monitors)
 
-        return jsonify(
-            monitors=monitors_serialized,
-            update='false'
-        )
 
-    # Else if the user is monitoring the subreddit already, update the subreddits.
-    else:
-        print('Create more Monitor instances for each keyword, subreddit, and logged in user')
+    # # Else if the user is monitoring the subreddit already, update the subreddits.
+    # else:
+    #     print('Create more Monitor instances for each keyword, subreddit, and logged in user')
+    #     #  Create a monitor instance for each keyword. Get rid of spaces**
+    #     subreddit_keywords = subreddit_keywords.split(',')
+    #     for kw in subreddit_keywords:
+    #         # check if Keyword objects are in the database already
+    #         if Keyword.query.filter_by(keyword=kw).first() is not None:
+    #             keyword = Keyword.query.filter_by(keyword=kw).first()
+    #         else: # create new Keyword objects
+    #             keyword = Keyword(kw)
+    #             db.session.add(keyword)
+
+            
 
 @application.route('/api/fetchSubredditsInfo', methods=['GET'])
 def fetchSubredditsInfo():
