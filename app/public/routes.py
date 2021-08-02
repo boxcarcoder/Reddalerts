@@ -53,10 +53,6 @@ def register():
     user = User(username, email, password)
     db.session.add(user)
 
-    # # Begin monitoring the user and their subreddits and keywords for the fetchSubreddits upon register/login.
-    # monitor = monitor(user=user, subreddit=None, keyword=None)
-    # db.session.add(monitor)
-
     try:
         db.session.commit()
     except IntegrityError:
@@ -108,7 +104,6 @@ def submitSubredditInfo():
 
         # Create a monitor object for the current user, subreddit, and keyword.
         monitor = Monitor(user=user, subreddit=subreddit, keyword=keyword)
-        print('commiting monitor object')
         db.session.add(monitor)
 
     db.session.commit()
@@ -122,30 +117,7 @@ def submitSubredditInfo():
         monitors=monitors_serialized,
         update=update
     )
-    # # Check if the user is monitoring the subreddit. Use join() to query multiple tables 
-    # # at the same time.
-    # if Monitor.query.join(Monitor.user, Monitor.subreddit)\
-    #     .filter(Monitor.user==user)\
-    #     .filter(Monitor.subreddit==subreddit).first() is None:
-    #     print('User is not monitoring this subreddit yet.')
-
-
-
-    # # Else if the user is monitoring the subreddit already, update the subreddits.
-    # else:
-    #     print('Create more Monitor instances for each keyword, subreddit, and logged in user')
-    #     #  Create a monitor instance for each keyword. Get rid of spaces**
-    #     subreddit_keywords = subreddit_keywords.split(',')
-    #     for kw in subreddit_keywords:
-    #         # check if Keyword objects are in the database already
-    #         if Keyword.query.filter_by(keyword=kw).first() is not None:
-    #             keyword = Keyword.query.filter_by(keyword=kw).first()
-    #         else: # create new Keyword objects
-    #             keyword = Keyword(kw)
-    #             db.session.add(keyword)
-
-            
-
+           
 @application.route('/api/fetchSubredditsInfo', methods=['GET'])
 def fetchSubredditsInfo():
     # Fetch the logged in user
@@ -161,9 +133,7 @@ def fetchSubredditsInfo():
         monitors = []
         monitors_serialized = []
     else: # the user is monitoring subreddit(s).
-        #Send over monitor objects corresponding to the logged in user?
         monitors = Monitor.query.join(Monitor.user).filter(Monitor.user==user).all()
-
         monitors_serialized = Monitor.serialize_list(monitors)
 
     return jsonify(monitors=monitors_serialized)
@@ -181,20 +151,25 @@ def deleteMonitoredSubreddit():
 
     # Fetch the Monitor instances that correspond to the logged in user and designated subreddit.
     subreddit = Subreddit.query.filter(Subreddit.subreddit_name==subreddit_name).first()
-    monitors = Monitor.query.join(Monitor.user, Monitor.subreddit).filter(Monitor.user==user, Monitor.subreddit==subreddit).all()
+    subreddit_monitors = Monitor.query.join(Monitor.user, Monitor.subreddit).filter(Monitor.user==user, Monitor.subreddit==subreddit).all()    
 
-    # Delete the monitor objects corresponding to the logged in user and designated subreddit.
-    for monitor in monitors:
-        db.session.delete(monitor)
+    # Delete the monitor objects corresponding to the designated subreddit.
+    for subreddit_monitor in subreddit_monitors:
+        db.session.delete(subreddit_monitor)
         db.session.commit()
 
     # Delete the Subreddit instance if there are no more Monitor instances corresponding to it.
     if Monitor.query.join(Monitor.subreddit).filter(Monitor.subreddit==subreddit).first() is None:
         db.session.delete(subreddit)
 
+        # Delete any Keyword instances if there are no more Subreddit instances corresponding to it.
+        keywords = Keyword.query.all()
+        for keyword in keywords:
+            print('keyword: ', keyword.keyword)
+            check_for_keyword_orphans(keyword)
+    
     # Return the new list of monitors that corrrespond to the logged in user and their subreddits (that now no longer have the deleted subreddit).
     new_monitors = Monitor.query.join(Monitor.user).filter(Monitor.user==user).all()
-    # print('new monitors after delete: ', new_monitors)
     return jsonify(monitors = Monitor.serialize_list(new_monitors))
 
 @application.route('/api/submitPhoneNumber', methods=['POST'])
@@ -231,13 +206,33 @@ def deletePhoneNumber():
 
     return jsonify(user.serialize())
 
-def check_for_subreddit_orphans(subreddit):
-    # check if each keyword has an associated user
-    if len(subreddit.users) == 0:
-        db.session.delete(subreddit)
-        return True # subreddit deleted since it has no associated user
+def check_for_keyword_orphans(keyword):
+    # check if each keyword has an associated subreddit
+
+    if keyword.monitors == []:
+        db.session.delete(keyword)
+        db.session.commit()
+        return True # keyword deleted
     else:
-        return False # subreddit has an associated user
+        return False # keyword has an associated subreddit
+
+
+# def check_for_keyword_orphans(keyword):
+#     # check if each keyword has an associated subreddit.
+
+#     if len(keyword.monitors.subreddit) == 0:
+#         db.session.delete(keyword)
+#         return True # keyword deleted
+#     else:
+#         return False # keyword has an associated subreddit
+
+# def check_for_subreddit_orphans(subreddit):
+#     # check if each keyword has an associated user
+#     if len(subreddit.users) == 0:
+#         db.session.delete(subreddit)
+#         return True # subreddit deleted since it has no associated user
+#     else:
+#         return False # subreddit has an associated user
 
 
 
