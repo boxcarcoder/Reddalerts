@@ -26,19 +26,17 @@ class User(db.Model, JsonSerializer):
     email = db.Column(db.String(128), index=True, unique=True)
     password_hash = db.Column(db.String(128))
     phone_num = db.Column(db.String(64), index=True, unique=True)
-    received_posts = db.Column(db.String(128), index=True, unique=True)
 
-    # monitor = db.relationship('Monitor', back_populates='user')
+    # Create a one to many relationship with ReceivedPost.
+    received_post = db.relationship('ReceivedPost', backref='users')
 
-    """
-    Helper Functions.
-    """
     # Constructor
-    def __init__(self, username, email, password):
+    def __init__(self, username, email, password, received_post):
         self.username = username
         self.email = email
         self.active = True
         self.password_hash = generate_password_hash(password)
+        # self.received_post = received_post
 
     # __repr__ tells Python how to print objects of this class.
     def __repr__(self):
@@ -50,8 +48,26 @@ class User(db.Model, JsonSerializer):
     # Overload serializer to delete Monitor column from a user object during serialization.
     def serialize(self):
         dictionary = JsonSerializer.serialize(self)
-        del dictionary["monitors"] 
+        del dictionary["monitors"]
+        del dictionary["received_post"]
         return dictionary
+
+class ReceivedPost(db.Model):
+    __tablename__ = 'received_posts'
+
+    id = db.Column(db.Integer, primary_key=True)
+    received_post = db.Column(db.Text, index=True)
+
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+    # Constructor
+    def __init__(self, received_post):
+        self.received_post = received_post
+        self.active = True
+
+    # __repr__ tells Python how to print objects of this class.
+    def __repr__(self):
+        return '<ReceivedPost {}>'.format(self.received_post)
 
 
 class Subreddit(db.Model, JsonSerializer):
@@ -60,9 +76,6 @@ class Subreddit(db.Model, JsonSerializer):
     id = db.Column(db.Integer, primary_key=True)
     subreddit_name = db.Column(db.String(128), index=True)
 
-    """
-    Helper Functions.
-    """
     # Constructor
     def __init__(self, subreddit_name):
         self.subreddit_name = subreddit_name
@@ -86,9 +99,6 @@ class Keyword(db.Model, JsonSerializer):
 
     # monitor = db.relationship('Monitor', back_populates='keyword')
 
-    """
-    Helper Functions.
-    """
     # Constructor
     def __init__(self, keyword):
         self.keyword = keyword
@@ -105,7 +115,7 @@ class Keyword(db.Model, JsonSerializer):
 
 
 class Monitor(db.Model, JsonSerializer):
-    __table_name__ = 'monitors'
+    __tablename__ = 'monitors'
 
     id = db.Column(db.Integer, primary_key=True)
 

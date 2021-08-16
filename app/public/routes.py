@@ -153,7 +153,7 @@ def deleteMonitoredSubreddit():
     subreddit = Subreddit.query.filter(Subreddit.subreddit_name==subreddit_name).first()
     subreddit_monitors = Monitor.query.join(Monitor.user, Monitor.subreddit).filter(Monitor.user==user, Monitor.subreddit==subreddit).all()    
 
-    # Delete the monitor objects corresponding to the designated subreddit.
+    # Delete the monitor instances corresponding to the designated subreddit.
     for subreddit_monitor in subreddit_monitors:
         db.session.delete(subreddit_monitor)
         db.session.commit()
@@ -208,7 +208,6 @@ def deletePhoneNumber():
 
 def check_for_keyword_orphans(keyword):
     # check if each keyword has an associated subreddit
-
     if keyword.monitors == []:
         db.session.delete(keyword)
         db.session.commit()

@@ -5,7 +5,7 @@ from twilio.rest import Client
 # The Flask application
 from app.application import application
 from app.extensions import db, scheduler
-from app.models import User, Subreddit, Keyword
+from app.models import User, Subreddit, Keyword, Monitor, ReceivedPost
 
 """ Create initial database designated by the DB URI, including all tables """
 db.create_all()
@@ -26,45 +26,64 @@ reddit.read_only = True
 client = Client(Config.TWILIO_ACCOUNT_SID, Config.TWILIO_AUTH_TOKEN)
 
 """ Periodically check for rising subreddits. """
-# Check the retrieved subreddit's rising posts for any monitored keywords.
-def check_for_submissions(user, subreddit, monitored_keywords):
+# Check the retrieved subreddit's rising posts for each monitored keyword.
+def check_for_submissions(user, subreddit, keyword):
     for submission in subreddit.rising():
-        for monitored_keyword in monitored_keywords:
-            submissionTitleSplit = submission.title.split()
-            if monitored_keyword.keyword in submissionTitleSplit and User.filter_by(received_posts=submission.title).one() is None:
-                message = client.messages \
-                    .create(
-                        body=submission.url,
-                        from_='+14256573687',
-                        to='+1' + user.phone_num
-                    )  
-                user.received_posts.append(submission.title)                                                        #see if append() uses relation magic or not
-                db.session.commit()       
+        submissionTitleSplit = submission.title.split()
+
+        # if keyword.keyword in submissionTitleSplit and User.query.join(ReceivedPost).filter_by(ReceivedPost.received_post=submission.title).first() is None:
+        # i'm querying for a received post, not for a user.
+        if keyword.keyword in submissionTitleSplit and ReceivedPost.query.join(User).filter(User.username==user.username, ReceivedPost.received_post==submission.title).first() is None:    
+            message = client.messages \
+                .create(
+                    body=submission.url,
+                    from_='+14256573687',
+                    to='+1' + user.phone_num
+                )  
+
+            # Prevent the same posts being sent to the user on repeat scans.
+            received_post = ReceivedPost(submission.title)
+            db.session.add(received_post)
+            user.received_post.append(received_post)  
+            print('user.received_post: ', user.received_post)
+            db.session.commit()       
 
 # Read all users in the database, and all of their subreddits and keywords.
 def read_database():
-    users = User.query.all()
-    for user in users:
-        monitored_subreddits = user.subreddits
+    print('reading database.')
+    monitors = Monitor.query.all()
+    for monitor in monitors:
+        user = monitor.user
+        subreddit = monitor.subreddit
+        keyword = monitor.keyword
 
-        for monitored_subreddit in monitored_subreddits:
-            monitored_keywords = monitored_subreddit.keywords
-            subreddit = reddit.subreddit(monitored_subreddit.subreddit_name)
-            check_for_submissions(user, subreddit, monitored_keywords)
+        monitored_subreddit = reddit.subreddit(subreddit.subreddit_name)
+        check_for_submissions(user, monitored_subreddit, keyword)
 
-scheduler.add_job(read_database, 'interval', minutes=1)
+
+# def read_database():
+#     users = User.query.all()
+#     for user in users:
+#         monitored_subreddits = user.subreddits
+
+#         for monitored_subreddit in monitored_subreddits:
+#             monitored_keywords = monitored_subreddit.keywords
+#             subreddit = reddit.subreddit(monitored_subreddit.subreddit_name)
+#             check_for_submissions(user, subreddit, monitored_keywords)
+
+scheduler.add_job(read_database, 'interval', minutes=2)
 
 """ Clear each user's queue (that stores what posts they've received already) after a day. """
-def clear_submissions_queue():
-    users = User.query.all()
-    for user in users:
-        user.received_posts = []    #*** i believe i can just set .received_posts to empty, as opposed to using .delete() since i am not deleting an entire row.
-    db.session.commit()             #***
-scheduler.add_job(clear_submissions_queue, 'interval', days=1)
+# def clear_submissions_queue():
+#     users = User.query.all()
+#     for user in users:
+#         user.received_posts = []    #*** i believe i can just set .received_posts to empty, as opposed to using .delete() since i am not deleting an entire row.
+#     db.session.commit()             #***
+# scheduler.add_job(clear_submissions_queue, 'interval', days=1)
 
 
 """ Start the scheduler """
-# scheduler.start()
+scheduler.start()
 
 
                 # print('title: ', submission.title) 
