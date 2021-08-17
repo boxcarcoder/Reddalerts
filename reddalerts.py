@@ -1,4 +1,5 @@
 import praw
+from prawcore import NotFound
 from config import Config
 from twilio.rest import Client
 
@@ -30,7 +31,7 @@ def check_for_submissions(user, subreddit, keyword):
     # Check the retrieved subreddit's rising posts for each monitored keyword.
     for submission in subreddit.rising():
         submissionTitleSplit = submission.title.split()
-        
+
         if keyword.keyword in submissionTitleSplit and ReceivedPost.query.join(User).filter(User.username==user.username, ReceivedPost.received_post==submission.title).first() is None:    
             # client.messages \
             #     .create(
@@ -46,17 +47,19 @@ def check_for_submissions(user, subreddit, keyword):
             user.received_post.append(received_post)  
             db.session.commit()       
 
-# Read all users in the database, and all of their subreddits and keywords.
+""" Read all users in the database, and all of their subreddits and keywords. """
 def read_database():
-    print('reading database.')
     monitors = Monitor.query.all()
     for monitor in monitors:
+        # User
         user = monitor.user
+        # Subreddit
         subreddit = monitor.subreddit
+        monitored_subreddit = reddit.subreddit(subreddit.subreddit_name)            
+        # Keyword
         keyword = monitor.keyword        
-        monitored_subreddit = reddit.subreddit(subreddit.subreddit_name)
+
         check_for_submissions(user, monitored_subreddit, keyword)
-    print('done reading database.')
 
 scheduler.add_job(read_database, 'interval', minutes=2)
 
@@ -69,6 +72,9 @@ def clear_user_received_post():
     db.session.commit()  
 
 scheduler.add_job(clear_user_received_post, 'interval', days=1)
+
+
+
 
 """ Start the scheduler """
 scheduler.start()

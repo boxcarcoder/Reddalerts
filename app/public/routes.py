@@ -8,6 +8,9 @@ from app.models import User, Subreddit, Keyword, Monitor
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from sqlalchemy.exc import IntegrityError
 import re
+import praw
+from prawcore import NotFound
+from config import Config
 
 @application.route('/', methods=['GET'])
 def index():
@@ -82,6 +85,11 @@ def submitSubredditInfo():
     user = User.query.get(logged_in_user_id)
     if user == None:
         return jsonify(message='User is not authorized.'), 401
+
+    # Check if the subreddit exists or not.
+    check_subreddit = subreddit_exists(subreddit_name)
+    if check_subreddit == False:
+        return jsonify(error=True), 404
 
     # Only create a new Subreddit instance if one doesn't exist in the database already.
     if Subreddit.query.filter(Subreddit.subreddit_name==subreddit_name).first() is None: 
@@ -205,6 +213,25 @@ def deletePhoneNumber():
     db.session.commit()
 
     return jsonify(user.serialize())
+
+
+
+""" Helper Functions. """
+def subreddit_exists(subreddit_name):
+    # Create a reddit instance to use the Reddit API.
+    reddit = praw.Reddit(client_id=Config.REDDIT_CLIENT_ID,
+                        client_secret=Config.REDDIT_CLIENT_SECRET, password=Config.REDDIT_PASSWORD,
+                        user_agent='Reddalerts 1.0 by u/boxcarcoder', username=Config.REDDIT_USERNAME)
+    reddit.read_only = True
+
+    # Check if the subreddit exists or not.
+    exists = True
+    try:
+        reddit.subreddits.search_by_name(subreddit_name, exact=True)
+    except NotFound:
+        exists = False
+    return exists       
+
 
 def check_for_keyword_orphans(keyword):
     # check if each keyword has an associated subreddit
