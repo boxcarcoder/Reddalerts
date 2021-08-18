@@ -31,12 +31,11 @@ class User(db.Model, JsonSerializer):
     received_post = db.relationship('ReceivedPost', backref='users')
 
     # Constructor
-    def __init__(self, username, email, password, received_post):
+    def __init__(self, username, email, password):
         self.username = username
         self.email = email
         self.active = True
         self.password_hash = generate_password_hash(password)
-        # self.received_post = received_post
 
     # __repr__ tells Python how to print objects of this class.
     def __repr__(self):
@@ -68,7 +67,6 @@ class ReceivedPost(db.Model):
     # __repr__ tells Python how to print objects of this class.
     def __repr__(self):
         return '<ReceivedPost {}>'.format(self.received_post)
-
 
 class Subreddit(db.Model, JsonSerializer):
     __tablename__ = 'subreddits'

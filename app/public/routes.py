@@ -187,7 +187,7 @@ def submitPhoneNumber():
     logged_in_user_id = incoming['id']
     phone_number = incoming['phoneNumber']
 
-    # Format the phone number to be stored consistently.
+    # Format the phone number to be stored  in the database consistently.
     correctFormatPhoneNum = re.sub('[^0-9]', '', phone_number)
 
     # Place the phone number into the database.
@@ -196,7 +196,10 @@ def submitPhoneNumber():
         return jsonify(message='User is not authorized.'), 401
     user.phone_num = correctFormatPhoneNum
 
-    db.session.commit()
+    try:
+        db.session.commit()
+    except Exception as e:
+        return jsonify(message='This phone number is taken already.'), 409
 
     return jsonify(user.serialize())
 
