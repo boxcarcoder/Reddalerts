@@ -100,9 +100,13 @@ def submitSubredditInfo():
         subreddit = Subreddit.query.filter(Subreddit.subreddit_name==subreddit_name).first()
         update = 'true'
         
-    # Create a monitor instance for each keyword. Get rid of spaces**
-    subreddit_keywords = subreddit_keywords.split(',')
-    for kw in subreddit_keywords:
+    # Create a monitor instance for each keyword.
+    subreddit_keywords = subreddit_keywords.split(',') # create a list of keywords 
+    subreddit_keywords_no_spaces = []
+    for subreddit_keyword in subreddit_keywords:
+        subreddit_keywords_no_spaces.append(subreddit_keyword.strip()) # remove leading and trailing white spaces from each keyword
+
+    for kw in subreddit_keywords_no_spaces:
         # check if Keyword objects are in the database already
         if Keyword.query.filter_by(keyword=kw).first() is not None:
             keyword = Keyword.query.filter_by(keyword=kw).first()
@@ -173,7 +177,6 @@ def deleteMonitoredSubreddit():
         # Delete any Keyword instances if there are no more Subreddit instances corresponding to it.
         keywords = Keyword.query.all()
         for keyword in keywords:
-            print('keyword: ', keyword.keyword)
             check_for_keyword_orphans(keyword)
     
     # Return the new list of monitors that corrrespond to the logged in user and their subreddits (that now no longer have the deleted subreddit).
@@ -235,7 +238,6 @@ def subreddit_exists(subreddit_name):
         exists = False
     return exists       
 
-
 def check_for_keyword_orphans(keyword):
     # check if each keyword has an associated subreddit
     if keyword.monitors == []:
@@ -246,170 +248,3 @@ def check_for_keyword_orphans(keyword):
         return False # keyword has an associated subreddit
 
 
-# def check_for_keyword_orphans(keyword):
-#     # check if each keyword has an associated subreddit.
-
-#     if len(keyword.monitors.subreddit) == 0:
-#         db.session.delete(keyword)
-#         return True # keyword deleted
-#     else:
-#         return False # keyword has an associated subreddit
-
-# def check_for_subreddit_orphans(subreddit):
-#     # check if each keyword has an associated user
-#     if len(subreddit.users) == 0:
-#         db.session.delete(subreddit)
-#         return True # subreddit deleted since it has no associated user
-#     else:
-#         return False # subreddit has an associated user
-
-
-
-
-
-
-
-
-
-# @application.route('/api/submitSubredditInfo', methods=['POST'])
-# def submitSubredditInfo():
-#     # Parse the incoming data
-#     incoming = request.get_json()
-#     subreddit_name = incoming["subredditName"]
-#     subreddit_keywords = incoming["subredditKeywords"]
-#     logged_in_user_id = incoming["id"]
-
-#     # Query the user to append subreddits and keywords to it.  
-#     user = User.query.get(logged_in_user_id)
-#     if user == None:
-#         return jsonify(message='User is not authorized.'), 401
-
-#     # Check if the user is monitor any subreddits yet.
-#     if (user.monitor is None):
-        
-
-
-
-
-    
-#     # Begin monitor the user and their subreddits and keywords.
-#     monitor = monitor(user=user, subreddit=None, keyword=None)
-#     db.session.add(monitor)
-
-#     # Check if the user is monitor this subreddit already. If they are, update the monitor instance with the keywords.    
-#     # if monitor.query.filter_by(user=user, subreddit=subreddit_name).first() is not None:
-#     if monitor.subreddit is not None:
-        
-#         monitor = monitor.query.filter_by(user=user, subreddit=subreddit_name).first()
-        
-#         # Add keyword instances to the monitor instance. Remove spaces too ***
-#         subreddit_keywords = subreddit_keywords.split(',')
-#         for kw in subreddit_keywords:
-#             # check if Keyword objects are in the database already
-#             if Keyword.query.filter_by(keyword=kw).first() is not None:
-#                 keyword = Keyword.query.filter_by(keyword=kw).first()
-#             else: # create new Keyword objects
-#                 keyword = Keyword(kw)            
-#             keyword.append(monitor)
-
-#         db.session.commit()       
-
-#         return jsonify(
-#             subreddit=monitor.query.filter_by(users=user, subreddits=subreddit_name).serialize(),
-#             update='true'
-#         )    
-
-#     # If they aren't monitor the subreddit yet, create a new subreddit instance and 
-#     # add it to the logged in user's monitor instance.
-#     else:
-#         subreddit = Subreddit(subreddit_name)
-
-#         # Add the subreddit instance to the current logged in user's monitor object.
-#         monitor.subreddit = subreddit
-
-#         # Add keyword instances to the monitor instance. Remove spaces too ***
-#         subreddit_keywords = subreddit_keywords.split(',')
-#         monitor_keywords = []
-#         for kw in subreddit_keywords:
-#             # check if Keyword objects are in the database already
-#             if Keyword.query.filter_by(keyword=kw).first() is not None:
-#                 keyword = Keyword.query.filter_by(keyword=kw).first()
-#             else: # create new Keyword objects
-#                 keyword = Keyword(kw)
-
-#             if (monitor.keyword is None):
-#                 monitor.keyword = keyword
-#             else:
-#                 monitor.keyword.append(keyword)      
-#                 # keyword.append(monitor)
-#                 # keyword.append(monitor)
-#                 # monitor.append(keyword)
-#                 # monitor.keyword.append(keyword)
-#                 # user.monitor.append(keyword)
-    
-#         # db.session.add(monitor)
-#         db.session.commit()
-
-#         return jsonify(
-#             subreddit=subreddit.serialize(),
-#             update='false'
-#         )    
-
-
-
-# def check_for_keyword_orphans(keyword):
-#     # check if each keyword has an associated subreddit
-#     if len(keyword.subreddits) == 0:
-#         db.session.delete(keyword)
-#         print('3')
-#         return True # keyword deleted
-#     else:
-#         print('4')
-#         return False # keyword has an associated subreddit
-
-
-
-
-
-    # if any(sr.subreddit_name == subreddit_name for sr in user.subreddits.all()): 
-    #     for sr in user.subreddits:
-    #         if sr.subreddit_name == subreddit_name:
-    #             subreddit = sr
-
-    #             # Add keyword instances to the subreddit instance
-    #             subreddit_keywords = subreddit_keywords.split(',')
-    #             for kw in subreddit_keywords:
-    #                 # check if Keyword objects are in the database already
-    #                 if Keyword.query.filter_by(keyword=kw).first() is not None:
-    #                     keyword = Keyword.query.filter_by(keyword=kw).first()
-    #                     subreddit.keywords.append(keyword) 
-    #                 else: # create new Keyword objects
-    #                     keyword = Keyword(kw)
-    #                     subreddit.keywords.append(keyword)
-
-                # db.session.commit()       
-
-                # return jsonify(
-                #     subreddit=subreddit.serialize(),
-                #     update='true'
-                # )    
-
-
-
-
-    # Testing how to query monitor for a certain user and subreddit:
-    # subreddit = Subreddit('stocks')
-    # keyword = Keyword('keyword')
-    # monitor = monitor(user=user, subreddit=subreddit, keyword=keyword)
-
-    # test = monitor.query.join(monitor.user, monitor.subreddit)\
-    #     .filter(monitor.user==user)\
-    #     .filter(monitor.subreddit==subreddit).all()
-    # print('================================')
-    # print('test: ', test[0])
-    # print('test.user: ', test[0].user)
-    # print('test.subreddit: ', test[0].subreddit)
-    # print('test.keyword: ', test[0].keyword)
-
-
-        # curr_user_monitors = Monitor.query.join(Monitor.user, aliased=True).filter_by(id=logged_in_user_id).first()
