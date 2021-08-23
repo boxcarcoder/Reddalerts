@@ -1,5 +1,4 @@
 import praw
-from prawcore import NotFound
 from config import Config
 from twilio.rest import Client
 
@@ -33,13 +32,13 @@ def check_for_submissions(user, subreddit, keyword):
         submissionTitleSplit = submission.title.split()
 
         if keyword.keyword in submissionTitleSplit and ReceivedPost.query.join(User).filter(User.username==user.username, ReceivedPost.received_post==submission.title).first() is None:    
-            # client.messages \
-            #     .create(
-            #         body='"' + submission.title + '"' + '\n'+ submission.url,
-            #         from_='+14256573687',
-            #         to='+1' + user.phone_num
-            #     )  
-            print('##### SENDING NEWFOUND SUBMISSION.')
+            client.messages \
+                .create(
+                    body='"' + submission.title + '"' + '\n'+ submission.url,
+                    from_='+14256573687',
+                    to='+1' + user.phone_num
+                )  
+            # print('sending text message for new post.')
 
             # Prevent the same posts being sent to the user on repeat scans.
             received_post = ReceivedPost(submission.title)
@@ -49,6 +48,7 @@ def check_for_submissions(user, subreddit, keyword):
 
 """ Read all users in the database, and all of their subreddits and keywords. """
 def read_database():
+    # print('reading database')
     monitors = Monitor.query.all()
     for monitor in monitors:
         # User
@@ -72,9 +72,6 @@ def clear_user_received_post():
     db.session.commit()  
 
 scheduler.add_job(clear_user_received_post, 'interval', days=1)
-
-
-
 
 """ Start the scheduler """
 scheduler.start()

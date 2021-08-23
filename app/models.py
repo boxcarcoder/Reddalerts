@@ -55,7 +55,7 @@ class ReceivedPost(db.Model):
     __tablename__ = 'received_posts'
 
     id = db.Column(db.Integer, primary_key=True)
-    received_post = db.Column(db.Text, index=True)
+    received_post = db.Column(db.Text)
 
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
