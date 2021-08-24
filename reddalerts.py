@@ -61,7 +61,7 @@ def read_database():
 
         check_for_submissions(user, monitored_subreddit, keyword)
 
-scheduler.add_job(read_database, 'interval', minutes=2)
+scheduler.add_job(read_database, 'interval', minutes=10)
 
 """ Clear each user's received posts after a day. """
 def clear_user_received_post():
