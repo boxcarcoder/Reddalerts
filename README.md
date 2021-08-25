@@ -34,3 +34,11 @@ This application is deployed with the following configurations:
 - The Elastic Beanstalk environment is configured with a load balancer to listen for domains listed on my client-side SSL certificate.
 - My CloudFlare DNS server uses CNAME records to redirect API requests to the Elastic Beanstalk environment through domains listed on the SSL certificate.
 - The MySQL database is hosted on AWS RDS.
+
+## Thoughts and Overview
+Learning how to design and implement a SQL database has been both challenging and rewarding. My initial design included a many-to-many relationship between `users` and `subreddits`, as well as a many-to-many relationship between `subreddits` and `keywords`. At first, it made sense since one user can have many subreddits while one subreddit can be monitored by many users, and one subreddit can have many keywords while one keyword can belong to many subreddits.
+
+However, problems arose when the combinations of `users`, `subreddits`, and `keywords` were not unique. If `user1` is monitoring `subreddit1` for `keyword1`, and `user2` is also monitoring `subreddit1` but decides to monitor the subreddit for `keyword2`, `keyword2` is appended to `subreddit1` despite `user1` not monitoring for `keyword2`. In order to maintain unique combinations, I had to change the design to use an `association object` that held all three foreign keys rather than `association tables`. Most of the API routes then query the association object table to find and use unique combinations.
+
+The usage of Flask as a micro web framework gave me the tools to write a server that contains API routes, and to treat the server as an application that can create tables and access a database. During development, I used the Flask Shell to query the SQLite database and for production, I used MySQL workbench, which I found to be very useful for viewing the contents of tables in a convenient graphical interface.
+
