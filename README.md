@@ -3,12 +3,13 @@
 ## Reddalerts
 
 An application for users to monitor their favorite Subreddits from the website, Reddit, based on specified keywords.
-
 ![image](https://user-images.githubusercontent.com/5587071/130664603-e4625320-6d93-48c0-9c96-f37f4f5e998b.png)
 
-![image](https://user-images.githubusercontent.com/5587071/130667161-b3c9538a-4227-49a1-b7ce-d828784c3625.png)
+<img width="1278" alt="Screen Shot 2022-01-31 at 8 42 26 AM" src="https://user-images.githubusercontent.com/5587071/151835460-74b140a0-5d34-4359-8da1-b76020dc81d4.png">
 
-![image](https://user-images.githubusercontent.com/5587071/130664934-53a7342d-8870-4173-a5ec-a3c68e7f89dd.png)
+<img width="1279" alt="Screen Shot 2022-01-31 at 8 44 38 AM" src="https://user-images.githubusercontent.com/5587071/151835881-3cea68ee-d300-4bfa-88ab-34f94448c7fe.png">
+
+<img width="1278" alt="Screen Shot 2022-01-31 at 8 47 21 AM" src="https://user-images.githubusercontent.com/5587071/151836281-c499d0b2-89d8-4004-ab4c-7dfb14337493.png">
 
 ## Installation And Set Up
 
